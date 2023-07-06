@@ -32,6 +32,8 @@ const createChatElement = (content, className) => {
     return chatDiv; // Return the created chat div
 }
 
+
+
 const getChatResponse = async (incomingChatDiv) => {
     const API_URL = "https://api.openai.com/v1/completions";
     const pElement = document.createElement("p");

@@ -1,6 +1,6 @@
 from fastapi import FastAPI,Request
 from pydantic import BaseModel
-from code_gen_api import model_api
+from src.code_gen_api import model_api
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
@@ -33,14 +33,16 @@ class PromptRequest(BaseModel):
 
 
 # mounting the static files
-app.mount("../static",StaticFiles(directory="static"),name="static")
-templates = Jinja2Templates(directory="../templates/")
+app.mount("/static",StaticFiles(directory="./static"),name="static")
+templates = Jinja2Templates(directory="./templates/")
 
 
 # render index.html
 @app.get("/",response_class=HTMLResponse)
 async def index(request:Request):
     return templates.TemplateResponse("index.html",context={"request":request})
+
+
 
 
 if __name__ == '__main__':
