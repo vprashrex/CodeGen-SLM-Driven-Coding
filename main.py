@@ -4,17 +4,21 @@ from pipeline import model_api
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse,JSONResponse
+from fastapi.responses import HTMLResponse,JSONResponse,StreamingResponse
 import uvicorn
 from pydantic import BaseModel
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
+import asyncio
 
 origins = [
     "*"
 ]
 
 app = FastAPI()
+
+connected_clients = set()
+
 app.add_middleware(
 
     CORSMiddleware,
@@ -55,19 +59,19 @@ async def load_model() -> AsyncGenerator[model_api.CodeGen,None]:
     finally:
         pass
 
+async def generate_words(model,user_prompt:str):
+    async with load_model() as model:
+        gen_words = model.infer(user_prompt)
+        for word in gen_words:
+            yield word
+            await asyncio.sleep(1)
+
+
 @app.post("/instruct_resp")
 async def generate(chat_request: ChatRequest):
     try:
         user_prompt = chat_request.prompt
-        async with load_model() as model:
-            gen_word = model.infer(user_prompt)
-            for word in gen_word:
-                print(word,end="",flush=True)
-            
-            print("")
-            return JSONResponse(
-                content={"response":word}
-            )
+        return StreamingResponse(generate_words(model,user_prompt),media_type="text/event-stream")
 
     except Exception as e:
         print(e)
