@@ -46,42 +46,7 @@ const getChatResponse = async (incomingChatDiv) => {
             prompt: userText,
         })
     }
-
-    try{
-        const response = await fetch(API_URL,requestOptions);
-        const reader = response.body.getReader();
-        const processStream = async () => {
-            while (true) {
-              const { done, value } = await reader.read();
-              if (done) break;
-      
-              const word = new TextDecoder().decode(value).trim();
-              pElement.textContent = word;
-      
-              // Remove the typing animation, append the paragraph element, and save the chats to local storage
-              incomingChatDiv.querySelector(".typing-animation").remove();
-              incomingChatDiv.querySelector(".chat-details").appendChild(pElement);
-              localStorage.setItem("all-chats", chatContainer.innerHTML);
-              chatContainer.scrollTo(0, chatContainer.scrollHeight);
-      
-              await new Promise((resolve) => setTimeout(resolve, 1000)); // Delay between displaying words
-            }
-        };
-
-        await processStream();
-    }catch(error){
-        pElement.classList.add("error");
-        pElement.textContent =
-        "Oops! Something went wrong while retrieving the response. Please try again.";
-
-        // Remove the typing animation, append the error paragraph element, and save the chats to local storage
-        incomingChatDiv.querySelector(".typing-animation").remove();
-        incomingChatDiv.querySelector(".chat-details").appendChild(pElement);
-        localStorage.setItem("all-chats", chatContainer.innerHTML);
-        chatContainer.scrollTo(0, chatContainer.scrollHeight);
-    }
-
-    /* // Send POST request to API, get response and set the reponse as paragraph element text
+    // Send POST request to API, get response and set the reponse as paragraph element text
     try {
         const response = await (await fetch(API_URL, requestOptions)).json();   
         pElement.textContent = response.response.trim();
@@ -94,7 +59,7 @@ const getChatResponse = async (incomingChatDiv) => {
     incomingChatDiv.querySelector(".typing-animation").remove();
     incomingChatDiv.querySelector(".chat-details").appendChild(pElement);
     localStorage.setItem("all-chats", chatContainer.innerHTML);
-    chatContainer.scrollTo(0, chatContainer.scrollHeight); */
+    chatContainer.scrollTo(0, chatContainer.scrollHeight);
 }
 
 const copyResponse = (copyBtn) => {
