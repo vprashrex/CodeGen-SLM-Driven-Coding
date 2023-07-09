@@ -1,6 +1,0 @@
-branch name frontend
-push to the branch frontend
-
-git add .
-git commit -m "frontend-update"
-git push origin frontend
