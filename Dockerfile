@@ -29,7 +29,15 @@ RUN if [ ! -d models ]; then \
         wget -O /app/models/replit-v2-codeinstruct-3b.q4_1.bin https://huggingface.co/abacaj/Replit-v2-CodeInstruct-3B-ggml/resolve/main/replit-v2-codeinstruct-3b.q4_1.bin; \
     fi
 
+# purge unused
+RUN apt-get remove -y --purge make gcc build-essential \
+    && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists/*
+
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
 
-CMD ["python3","-u","inference.py"]
+#CMD ["python3","-u","inference.py"]
+
+RUN chmod +x entrypoint.sh
+CMD ["./entrypoint.sh"]
