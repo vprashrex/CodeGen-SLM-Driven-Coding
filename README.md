@@ -1,5 +1,19 @@
 ## CodeGen v1.1
 
+# how to update the submodule of pic.ai-v2.1
+
+FIRST cd into alina-code
+```sh
+cd alina-code
+```
+
+NEXT update the submodule
+```sh
+git submodule update --init 
+```
+
+
+
 :triangular_flag_on_post: **Updates**
 
 - :white_check_mark: Added server.py script for inferencing the CodeGen on web
