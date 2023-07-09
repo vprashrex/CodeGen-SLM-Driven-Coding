@@ -2,3 +2,6 @@
 	path = ctransformers
 	url = https://github.com/abacaj/ctransformers
 	branch = replit-code
+[submodule "alina-code/pic.ai-v2.1"]
+	path = alina-code/pic.ai-v2.1
+	url = https://github.com/vprashrex/pic.ai-v2.1
