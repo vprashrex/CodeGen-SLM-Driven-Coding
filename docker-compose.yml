@@ -1,0 +1,12 @@
+version: '3'
+services:
+  CodeGen:
+    container_name: Versys-CodeGen
+    image: codegen
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+
