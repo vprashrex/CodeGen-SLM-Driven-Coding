@@ -5,7 +5,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse,JSONResponse
-import uvicorn
 from pydantic import BaseModel
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
@@ -44,6 +43,10 @@ model = model_api.CodeGen()
 async def index(request:Request):
     return templates.TemplateResponse("index.html",context={"request":request})
 
+from fastapi.responses import StreamingResponse
+import asyncio
+
+
 class ChatRequest(BaseModel):
     prompt: str
 
@@ -56,24 +59,31 @@ async def load_model() -> AsyncGenerator[model_api.CodeGen,None]:
         pass
 
 
+import io
+import sys
+
+async def steam_buffer(word:str):
+    buffer = io.StringIO()
+    sys.stdout = buffer
+    sys.stdout.write(word)
+    out = buffer.getvalue()
+    sys.stdout = sys.__stdout__
+    return out
+
+async def generate_word(prompt: str):
+    async with load_model() as model:
+        gen_word = model.infer(prompt)
+        for word in gen_word:
+            yield f"{word}\n"
+
 @app.post("/instruct_resp")
 async def generate(chat_request: ChatRequest):
     try:
-        user_prompt = chat_request.prompt
-        async with load_model() as model:
-            gen_word = model.infer(user_prompt)
-            for word in gen_word:
-                print(word,end="",flush=True)
-            print("")
-            return JSONResponse(
-                content={"response":word}
-            )
-
+        user_prompt = chat_request.prompt    
+        return StreamingResponse(
+            generate_word(user_prompt),
+            media_type="text/plain"
+        )
     except Exception as e:
         print(e)
         return JSONResponse(status_code=400,content={"error":str(e)})
-
-
-
-if __name__ == '__main__':
-    uvicorn.run("main:app",port="5000",reload=True)

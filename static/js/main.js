@@ -1,22 +1,15 @@
 const chatInput = document.querySelector("#chat-input");
 const sendButton = document.querySelector("#send-btn");
 const chatContainer = document.querySelector(".chat-container");
-const themeButton = document.querySelector("#theme-btn");
 const deleteButton = document.querySelector("#delete-btn");
 
 let userText = null;
 
 const loadDataFromLocalstorage = () => {
-    // Load saved chats and theme from local storage and apply/add on the page
-    const themeColor = localStorage.getItem("themeColor");
-
-    document.body.classList.toggle("light-mode", themeColor === "light_mode");
-    themeButton.innerText = document.body.classList.contains("light-mode") ? "dark_mode" : "light_mode";
-
     const defaultText = `<div class="default-text">
                             <h1>CodeGen: LLMDriven Coding</h1>
                             <p>This is a code instruct Model.</p>
-                            <p>If you any query regarding the code,<br>just type the query and you will get the answer</p>
+                            <p>If you have any query regarding the code,<br>just type the query and you will get the answer</p>
                         </div>`
 
     chatContainer.innerHTML = localStorage.getItem("all-chats") || defaultText;
@@ -32,11 +25,11 @@ const createChatElement = (content, className) => {
     return chatDiv; // Return the created chat div
 }
 
-
+  
 const getChatResponse = async (incomingChatDiv) => {
     const API_URL = "/instruct_resp";
-    const pElement = document.createElement("p");
-    
+    const pElement = document.createElement("p"); // Create a new p element
+        
     const requestOptions = {
         method: "POST",
         headers: {
@@ -48,12 +41,127 @@ const getChatResponse = async (incomingChatDiv) => {
     }
     // Send POST request to API, get response and set the reponse as paragraph element text
     try {
-        const response = await (await fetch(API_URL, requestOptions)).json();   
-        pElement.textContent = response.response.trim();
+
+        const response = await fetch(API_URL,requestOptions);
+        const reader = response.body.getReader();
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            const chunk = new TextDecoder().decode(value);
+            let receivedData = "";
+            receivedData += chunk;
+            const words = receivedData.split("\n");
+            let word = words[0];
+            let remaining = "";
+
+
+            if (word.includes("  ")) {
+                const doubleSpaceIndex = word.indexOf("  ");
+                const nextLine = word.substring(0, doubleSpaceIndex)  + "\n" ;
+                const remainingSpace = word.substring(doubleSpaceIndex + 2);
+                const trimmedRemainingSpace = remainingSpace.trim();
+                const spacesOnNextLine = remainingSpace.match(/ +/g);
+
+                if (spacesOnNextLine) {
+                    word = nextLine + spacesOnNextLine.join("\n");
+                    remaining += words.slice(1).join("\n");
+                    remaining = trimmedRemainingSpace.length > 0 ? trimmedRemainingSpace + " " : "";
+                } else {
+                    remaining = words.slice(1).join("\n");
+                }
+            }
+
+            pElement.textContent += word + "";
+            incomingChatDiv.querySelector(".chat-details").appendChild(pElement);
+
+            if (remaining) {
+                // Create a new paragraph for the remaining space
+                const newPElem = document.createElement("p");
+                newPElem.textContent = remaining;
+                incomingChatDiv.querySelector(".chat-details").appendChild(newPElem);
+            }
+
+            receivedData = "";
+        }
+        
+
+        /* while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            const chunk = new TextDecoder().decode(value);
+            receivedData += chunk;
+            const words = receivedData.split("\n");
+            let word = words[0];
+            let remaining = "";
+            if (words.length > 1) {
+              if (word.includes("  ")) {
+                const doubleSpaceIndex = word.indexOf("  ");
+                const nextLine = word.substring(0, doubleSpaceIndex) + "\n";
+                const remainingSpace = word.substring(doubleSpaceIndex + 2);
+                const trimmedRemainingSpace = remainingSpace.trim();
+                const spacesOnNextLine = remainingSpace.match(/ +/g);
+                if (spacesOnNextLine) {
+                  word = nextLine + spacesOnNextLine.join("\n");
+                  remaining += words.slice(1).join("\n");
+                  remaining = trimmedRemainingSpace.length > 0 ? trimmedRemainingSpace + " " : "";
+                } else {
+                  remaining = words.slice(1).join("\n");
+                }
+              } else {
+                remaining = words.slice(1).join("\n");
+              }
+            }
+            pElement.textContent += word;
+            incomingChatDiv.querySelector(".chat-details").appendChild(pElement);
+            if (remaining) {
+              // Create a new paragraph for the remaining space
+              const newPElem = document.createElement("p");
+              newPElem.textContent = remaining;
+              incomingChatDiv.querySelector(".chat-details").appendChild(newPElem);
+            }
+            receivedData = "";
+        } */
+          
+
+        /* while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            const chunk = new TextDecoder().decode(value);
+            receivedData += chunk;
+            const words = receivedData.split("\n");
+            let word = words[0];
+            let remaining = "";
+            if (words.length > 1) {
+                if (word.includes("  ")) {
+                    const doubleSpaceIndex = word.indexOf("  ");
+                    const nextLine = word.substring(0, doubleSpaceIndex) + "\n";
+                    const remainingSpace = word.substring(doubleSpaceIndex + 2);
+                    const trimmedRemainingSpace = remainingSpace.trim();
+                    const spacesOnNextLine = remainingSpace.match(/ +/g).join("\n");
+                    word = nextLine + spacesOnNextLine;
+                    remaining += words.slice(1).join(" ");
+                    remaining = trimmedRemainingSpace.length > 0 ? trimmedRemainingSpace + " " : "";
+                }
+            }
+            pElement.textContent += word;
+            incomingChatDiv.querySelector(".chat-details").appendChild(pElement);
+            if (remaining) {
+                // Create a new paragraph for the remaining space
+                const newPElem = document.createElement("p");
+                newPElem.textContent = remaining;
+                incomingChatDiv.querySelector(".chat-details").appendChild(newPElem);
+            }
+            receivedData = "";
+        } */
+             
+        
     } catch (error) { // Add error class to the paragraph element and set error text
         pElement.classList.add("error");
-        pElement.textContent = "Oops! Something went wrong while retrieving the response. Please try again.";
+        pElement.textContent = error;
     }
+
+
 
     // Remove the typing animation, append the paragraph element and save the chats to local storage
     incomingChatDiv.querySelector(".typing-animation").remove();
@@ -119,13 +227,6 @@ deleteButton.addEventListener("click", () => {
         localStorage.removeItem("all-chats");
         loadDataFromLocalstorage();
     }
-});
-
-themeButton.addEventListener("click", () => {
-    // Toggle body's class for the theme mode and save the updated theme to the local storage 
-    document.body.classList.toggle("light-mode");
-    localStorage.setItem("themeColor", themeButton.innerText);
-    themeButton.innerText = document.body.classList.contains("light-mode") ? "dark_mode" : "light_mode";
 });
 
 const initialInputHeight = chatInput.scrollHeight;
