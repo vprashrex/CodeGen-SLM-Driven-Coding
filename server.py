@@ -73,6 +73,20 @@ async def generate(chat_request: ChatRequest):
         print(e)
         return JSONResponse(status_code=400,content={"error":str(e)})
 
+@app.post("/message")
+async def generate(chat_request: ChatRequest):
+    try:
+        '''
+        id: conv_id,
+        conv_name --> first_question
+        questions
+        answer
+        last_online: timestamp
+        '''
+
+    except Exception as e:
+        print(e)
+        return JSONResponse(status_code=400,content={"error":str(e)})
 
 
 if __name__ == '__main__':

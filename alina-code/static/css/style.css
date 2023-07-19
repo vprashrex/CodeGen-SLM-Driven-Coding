@@ -55,6 +55,7 @@ body {
   height: 70vh;
   padding: 0 10px;
   text-align: center;
+  font-family: sans-serif;
   color: var(--text-color);
 }
 .default-text h1 {
@@ -62,7 +63,7 @@ body {
 }
 .default-text p {
   margin-top: 10px;
-  font-size: 1.1rem;
+  font-size: 1.5rem;
 }
 .chat-container .chat {
   padding: 25px 10px;

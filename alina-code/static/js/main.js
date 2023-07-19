@@ -14,9 +14,8 @@ const loadDataFromLocalstorage = () => {
     themeButton.innerText = document.body.classList.contains("light-mode") ? "dark_mode" : "light_mode";
 
     const defaultText = `<div class="default-text">
-                            <h1>CodeGen: LLMDriven Coding</h1>
-                            <p>This is a code instruct Model.</p>
-                            <p>If you any query regarding the code,<br>just type the query and you will get the answer</p>
+                            <h1>Welcome to CodeGen</h1>
+                            <p>CodeGen - LLM Driven Coding</p>
                         </div>`
 
     chatContainer.innerHTML = localStorage.getItem("all-chats") || defaultText;
