@@ -4,12 +4,29 @@
   <head>
     <meta charset="utf-8">
     <title>ChatGPT Clone in JavaScript | CodingNepal</title>
-    <link rel="stylesheet" href="static/css/style.css">
+    <link rel="stylesheet" href="../static/css/style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Google Fonts Link For Icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    <script src="static/js/main.js" defer></script>
+    <script src="../static/js/main.js" defer></script>
+    <script src="https://kit.fontawesome.com/98a4884448.js" crossorigin="anonymous"></script>
   </head>
+
+  <style>
+    #delete-btn{
+      background-color: #343541;
+      font-size: 24px;
+      border: none;
+      cursor: pointer;
+    }
+
+    #chat-input::placeholder{
+      color:#f1f2f788
+    }
+
+
+  </style>
+
   <body>
     <!-- Chats container -->
     <div class="chat-container"></div>
@@ -19,13 +36,24 @@
       <div class="typing-content">
         <div class="typing-textarea">
           <textarea id="chat-input" spellcheck="false" placeholder="Enter a prompt here" required></textarea>
-          <span id="send-btn" class="material-symbols-rounded">send</span>
+          <span id="send-btn" >
+            <svg width="22" height="20" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0.715001 1.45379C0.714918 1.23796 0.778763 1.0258 0.900319 0.837946C1.02188 0.650097 1.19701 0.492956 1.40866 0.381825C1.62031 0.270693 1.86127 0.209356 2.10809 0.203786C2.35491 0.198216 2.59917 0.248601 2.8171 0.350036L21.2184 8.89627C21.4474 9.00277 21.6392 9.16177 21.7729 9.35619C21.9065 9.5506 21.9771 9.77319 21.9771 10C21.9771 10.2269 21.9065 10.4494 21.7729 10.6439C21.6392 10.8384 21.4474 10.9973 21.2184 11.1038L2.81567 19.65C2.59768 19.7512 2.35344 19.8014 2.10671 19.7956C1.85998 19.7899 1.61916 19.7283 1.40767 19.6171C1.19619 19.5059 1.02126 19.3486 0.89987 19.1608C0.778493 18.9729 0.714803 18.7608 0.715001 18.545V12.9125C0.714976 12.6209 0.831606 12.3384 1.0447 12.114C1.2578 11.8897 1.55395 11.7374 1.88188 11.6838L12.155 10L1.88188 8.31629C1.55395 8.26263 1.2578 8.11042 1.0447 7.88603C0.831606 7.66164 0.714976 7.37917 0.715001 7.08754V1.45379Z" fill="white"/>
+              </svg>
+              
+          </span>
         </div>
         <div class="typing-controls">
-          <span id="theme-btn" class="material-symbols-rounded">light_mode</span>
-          <span id="delete-btn" class="material-symbols-rounded">delete</span>
+          <span id="delete-btn">
+            <svg width="28" height="32" viewBox="0 0 28 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2 7.5H4.66667H26" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M23.3333 7.49998V27.3333C23.3333 28.0848 23.0524 28.8054 22.5523 29.3368C22.0522 29.8681 21.3739 30.1666 20.6667 30.1666H7.33333C6.62609 30.1666 5.94781 29.8681 5.44771 29.3368C4.94762 28.8054 4.66666 28.0848 4.66666 27.3333V7.49998M8.66666 7.49998V4.66665C8.66666 3.9152 8.94762 3.19453 9.44771 2.66318C9.94781 2.13182 10.6261 1.83331 11.3333 1.83331H16.6667C17.3739 1.83331 18.0522 2.13182 18.5523 2.66318C19.0524 3.19453 19.3333 3.9152 19.3333 4.66665V7.49998" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M11.3333 14.5833V23.0833" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M16.6667 14.5833V23.0833" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>                            
+          </span>
       </div>
     </div>
-
+    
   </body>
 </html>
