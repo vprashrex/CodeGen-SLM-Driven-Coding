@@ -44,7 +44,6 @@ async def index(request:Request):
     return templates.TemplateResponse("index.html",context={"request":request})
 
 from fastapi.responses import StreamingResponse
-import asyncio
 
 
 class ChatRequest(BaseModel):
@@ -71,12 +70,27 @@ async def steam_buffer(word:str):
     return out
 
 async def generate_word(prompt: str):
+
     async with load_model() as model:
         gen_word = model.infer(prompt)
         for word in gen_word:
-            yield f"{word}\n"
+            yield word
 
 @app.post("/instruct_resp")
+async def generate(chat_request: ChatRequest):
+    try:
+        user_prompt = chat_request.prompt
+
+        return StreamingResponse(
+            generate_word(user_prompt),
+            status_code=200,
+            media_type="text/plain"
+        )
+    except Exception as e:
+        print(e)
+        return JSONResponse(status_code=400,content={"error":str(e)})
+
+''' @app.post("/instruct_resp")
 async def generate(chat_request: ChatRequest):
     try:
         user_prompt = chat_request.prompt    
@@ -86,4 +100,4 @@ async def generate(chat_request: ChatRequest):
         )
     except Exception as e:
         print(e)
-        return JSONResponse(status_code=400,content={"error":str(e)})
+        return JSONResponse(status_code=400,content={"error":str(e)}) '''

@@ -26,17 +26,27 @@ class CodeGen:
         self.model = None
 
 
-    def format_prompt(self,user_prompt: str):
+    ''' def format_prompt(self,user_prompt: str):
         return f"""### Instruction:
             {user_prompt}
 
-        ### Response:"""
+        ### Response:""" '''
+
+    def format_prompt(self, user_prompt: str):
+        prompt = "### Instruction:\n"
+        prompt += f"{user_prompt}\n\n"
+        prompt += "### Response:\n"
+        config_attributes = [attr for attr in dir(GenerationConfig) if not attr.startswith("__")]
+        for attr in config_attributes:
+            value = getattr(GenerationConfig, attr)
+            prompt += f"{attr}: {value}\n"
+        return prompt
 
     def generate(self,llm: AutoModelForCausalLM,generation_config:GenerationConfig,user_prompt:str):
         return llm(
             self.format_prompt(user_prompt),
             **asdict(generation_config)
-        )
+        )   
 
     def initliaze_model(self):
         if self.model is None:
@@ -64,6 +74,13 @@ class CodeGen:
 
         gen_word = self.generate(self.model,generation_config,user_prompt.strip())
         return gen_word
+
+    def __iter__(self):
+        if not self.model:
+            raise StopIteration
+        else:
+            for word in self.model:
+                yield  word
 
     
 if __name__ == '__main__':

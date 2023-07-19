@@ -6,6 +6,9 @@ const deleteButton = document.querySelector("#delete-btn");
 let userText = null;
 
 const loadDataFromLocalstorage = () => {
+
+   
+    
     const defaultText = `<div class="default-text">
                             <h1>CodeGen: LLMDriven Coding</h1>
                             <p>This is a code instruct Model.</p>
@@ -14,6 +17,7 @@ const loadDataFromLocalstorage = () => {
 
     chatContainer.innerHTML = localStorage.getItem("all-chats") || defaultText;
     chatContainer.scrollTo(0, chatContainer.scrollHeight); // Scroll to bottom of the chat container
+
 }
 
 
@@ -43,118 +47,50 @@ const getChatResponse = async (incomingChatDiv) => {
     try {
 
         const response = await fetch(API_URL,requestOptions);
-        const reader = response.body.getReader();
-
-        while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            const chunk = new TextDecoder().decode(value);
-            let receivedData = "";
-            receivedData += chunk;
-            const words = receivedData.split("\n");
-            let word = words[0];
-            let remaining = "";
-
-
-            if (word.includes("  ")) {
-                const doubleSpaceIndex = word.indexOf("  ");
-                const nextLine = word.substring(0, doubleSpaceIndex)  + "\n" ;
-                const remainingSpace = word.substring(doubleSpaceIndex + 2);
-                const trimmedRemainingSpace = remainingSpace.trim();
-                const spacesOnNextLine = remainingSpace.match(/ +/g);
-
-                if (spacesOnNextLine) {
-                    word = nextLine + spacesOnNextLine.join("\n");
-                    remaining += words.slice(1).join("\n");
-                    remaining = trimmedRemainingSpace.length > 0 ? trimmedRemainingSpace + " " : "";
-                } else {
-                    remaining = words.slice(1).join("\n");
-                }
-            }
-
-            pElement.textContent += word + "";
-            incomingChatDiv.querySelector(".chat-details").appendChild(pElement);
-
-            if (remaining) {
-                // Create a new paragraph for the remaining space
-                const newPElem = document.createElement("p");
-                newPElem.textContent = remaining;
-                incomingChatDiv.querySelector(".chat-details").appendChild(newPElem);
-            }
-
-            receivedData = "";
-        }
+        const contentType = response.headers.get("Content-Type");
         
 
-        /* while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            const chunk = new TextDecoder().decode(value);
-            receivedData += chunk;
-            const words = receivedData.split("\n");
-            let word = words[0];
-            let remaining = "";
-            if (words.length > 1) {
-              if (word.includes("  ")) {
-                const doubleSpaceIndex = word.indexOf("  ");
-                const nextLine = word.substring(0, doubleSpaceIndex) + "\n";
-                const remainingSpace = word.substring(doubleSpaceIndex + 2);
-                const trimmedRemainingSpace = remainingSpace.trim();
-                const spacesOnNextLine = remainingSpace.match(/ +/g);
-                if (spacesOnNextLine) {
-                  word = nextLine + spacesOnNextLine.join("\n");
-                  remaining += words.slice(1).join("\n");
-                  remaining = trimmedRemainingSpace.length > 0 ? trimmedRemainingSpace + " " : "";
-                } else {
-                  remaining = words.slice(1).join("\n");
-                }
-              } else {
-                remaining = words.slice(1).join("\n");
-              }
-            }
-            pElement.textContent += word;
-            incomingChatDiv.querySelector(".chat-details").appendChild(pElement);
-            if (remaining) {
-              // Create a new paragraph for the remaining space
-              const newPElem = document.createElement("p");
-              newPElem.textContent = remaining;
-              incomingChatDiv.querySelector(".chat-details").appendChild(newPElem);
-            }
-            receivedData = "";
-        } */
-          
+        const stream = new ReadableStream({
+            start(controller){
+                const reader = response.body.getReader();
 
-        /* while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            const chunk = new TextDecoder().decode(value);
-            receivedData += chunk;
-            const words = receivedData.split("\n");
-            let word = words[0];
-            let remaining = "";
-            if (words.length > 1) {
-                if (word.includes("  ")) {
-                    const doubleSpaceIndex = word.indexOf("  ");
-                    const nextLine = word.substring(0, doubleSpaceIndex) + "\n";
-                    const remainingSpace = word.substring(doubleSpaceIndex + 2);
-                    const trimmedRemainingSpace = remainingSpace.trim();
-                    const spacesOnNextLine = remainingSpace.match(/ +/g).join("\n");
-                    word = nextLine + spacesOnNextLine;
-                    remaining += words.slice(1).join(" ");
-                    remaining = trimmedRemainingSpace.length > 0 ? trimmedRemainingSpace + " " : "";
+                function read(){
+                    return reader.read().then(({done,value}) => {
+                        if(done){
+                            controller.close();
+                            return;
+                        }
+
+                        controller.enqueue(value);
+                        return read();
+                    });
                 }
+
+                return read();
+
             }
-            pElement.textContent += word;
+        });
+
+        const readableStreamResponse = new Response(stream,{
+            headers: {'Content-Type': contentType}
+        });
+
+        const decoder = new TextDecoder();
+        let result = "";
+
+        const reader = readableStreamResponse.body.getReader();
+        while (true){
+            const {done,value} = await reader.read();
+            if (done){
+                break;
+            }
+
+            result += decoder.decode(value);
+            
+            pElement.textContent = result;
             incomingChatDiv.querySelector(".chat-details").appendChild(pElement);
-            if (remaining) {
-                // Create a new paragraph for the remaining space
-                const newPElem = document.createElement("p");
-                newPElem.textContent = remaining;
-                incomingChatDiv.querySelector(".chat-details").appendChild(newPElem);
-            }
-            receivedData = "";
-        } */
-             
+
+        }
         
     } catch (error) { // Add error class to the paragraph element and set error text
         pElement.classList.add("error");
@@ -182,7 +118,7 @@ const showTypingAnimation = () => {
     // Display the typing animation and call the getChatResponse function
     const html = `<div class="chat-content">
                     <div class="chat-details">
-                        <img src="images/chatbot.jpg" alt="chatbot-img">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="1.5em" viewBox="0 0 640 512" class=user_icon><style>user_icon{fill:#ffffff}</style><path d="M320 0c17.7 0 32 14.3 32 32V96H472c39.8 0 72 32.2 72 72V440c0 39.8-32.2 72-72 72H168c-39.8 0-72-32.2-72-72V168c0-39.8 32.2-72 72-72H288V32c0-17.7 14.3-32 32-32zM208 384c-8.8 0-16 7.2-16 16s7.2 16 16 16h32c8.8 0 16-7.2 16-16s-7.2-16-16-16H208zm96 0c-8.8 0-16 7.2-16 16s7.2 16 16 16h32c8.8 0 16-7.2 16-16s-7.2-16-16-16H304zm96 0c-8.8 0-16 7.2-16 16s7.2 16 16 16h32c8.8 0 16-7.2 16-16s-7.2-16-16-16H400zM264 256a40 40 0 1 0 -80 0 40 40 0 1 0 80 0zm152 40a40 40 0 1 0 0-80 40 40 0 1 0 0 80zM48 224H64V416H48c-26.5 0-48-21.5-48-48V272c0-26.5 21.5-48 48-48zm544 0c26.5 0 48 21.5 48 48v96c0 26.5-21.5 48-48 48H576V224h16z"/></svg>
                         <div class="typing-animation">
                             <div class="typing-dot" style="--delay: 0.2s"></div>
                             <div class="typing-dot" style="--delay: 0.3s"></div>
@@ -208,7 +144,7 @@ const handleOutgoingChat = () => {
 
     const html = `<div class="chat-content">
                     <div class="chat-details">
-                        <img src="images/user.jpg" alt="user-img">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="1.5em" viewBox="0 0 448 512" class=user_icon><style>.user_icon{fill:#ffffff}</style><path d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z"/></svg>
                         <p>${userText}</p>
                     </div>
                 </div>`;
@@ -228,6 +164,7 @@ deleteButton.addEventListener("click", () => {
         loadDataFromLocalstorage();
     }
 });
+
 
 const initialInputHeight = chatInput.scrollHeight;
 
