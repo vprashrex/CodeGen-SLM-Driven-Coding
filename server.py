@@ -49,6 +49,10 @@ from fastapi.responses import StreamingResponse
 class ChatRequest(BaseModel):
     prompt: str
 
+class MessageRequest(BaseModel):
+    question: str
+    answer: str
+
 
 @asynccontextmanager 
 async def load_model() -> AsyncGenerator[model_api.CodeGen,None]:
@@ -89,15 +93,3 @@ async def generate(chat_request: ChatRequest):
     except Exception as e:
         print(e)
         return JSONResponse(status_code=400,content={"error":str(e)})
-
-''' @app.post("/instruct_resp")
-async def generate(chat_request: ChatRequest):
-    try:
-        user_prompt = chat_request.prompt    
-        return StreamingResponse(
-            generate_word(user_prompt),
-            media_type="text/plain"
-        )
-    except Exception as e:
-        print(e)
-        return JSONResponse(status_code=400,content={"error":str(e)}) '''
