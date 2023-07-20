@@ -31,7 +31,7 @@ const createChatElement = (content, className) => {
 
   
 const getChatResponse = async (incomingChatDiv) => {
-    const API_URL = "/instruct_resp";
+    const API_URL = "api/instruct_resp";
     const pElement = document.createElement("p"); // Create a new p element
         
     const requestOptions = {
