@@ -7,6 +7,7 @@ from api.schemas.chat_schema import ChatRequest
 from fastapi.responses import JSONResponse
 import io
 import sys
+import asyncio
 
 router = APIRouter()
 model = model_api.CodeGen()
@@ -37,6 +38,7 @@ async def generate_word(prompt: str):
 async def generate(chat_request: ChatRequest):
     try:
         user_prompt = chat_request.prompt
+        
         return StreamingResponse(
             generate_word(user_prompt),
             status_code=200,
