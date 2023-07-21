@@ -4,10 +4,11 @@ from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 from fastapi.responses import StreamingResponse
 from api.schemas.chat_schema import ChatRequest
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse,Response
 import io
 import sys
 import asyncio
+import concurrent.futures
 
 router = APIRouter()
 model = model_api.CodeGen()
@@ -30,15 +31,16 @@ async def load_model() -> AsyncGenerator[model_api.CodeGen,None]:
 
 async def generate_word(prompt: str):
     async with load_model() as model:
-        gen_word = model.infer(prompt)
+        gen_word = model.infer(prompt,1)
         for word in gen_word:
             yield word
-
+        
+       
 @router.post("/api/instruct_resp",tags=["chat"])
 async def generate(chat_request: ChatRequest):
     try:
         user_prompt = chat_request.prompt
-        
+
         return StreamingResponse(
             generate_word(user_prompt),
             status_code=200,

@@ -1,6 +1,7 @@
 import os
 from ctransformers import AutoModelForCausalLM, AutoConfig
 from dataclasses import dataclass,asdict
+import concurrent.futures
 
 @dataclass
 class GenerationConfig:
@@ -25,13 +26,6 @@ class CodeGen:
     def __init__(self):
         self.model = None
 
-
-    ''' def format_prompt(self,user_prompt: str):
-        return f"""### Instruction:
-            {user_prompt}
-
-        ### Response:""" '''
-
     def format_prompt(self, user_prompt: str):
         prompt = "### Instruction:\n"
         prompt += f"{user_prompt}\n\n"
@@ -42,12 +36,23 @@ class CodeGen:
             prompt += f"{attr}: {value}\n"
         return prompt
 
-    def generate(self,llm: AutoModelForCausalLM,generation_config:GenerationConfig,user_prompt:str):
-        return llm(
-            self.format_prompt(user_prompt),
-            **asdict(generation_config)
-        )   
-
+    # GENERATE WORD WITH TIMEOUT_CONDITION
+    def generate(self,llm: AutoModelForCausalLM,generation_config: GenerationConfig,user_prompt:str,timeout: int):
+        def generation_task():
+            response = llm(
+                self.format_prompt(user_prompt),
+                **asdict(generation_config)
+            )
+            return response
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            future = executor.submit(generation_task)
+            try:
+                response = future.result(timeout=timeout)
+            except concurrent.futures.TimeoutError:
+                future.cancel()
+                print("Took Long to Respond!")
+                return None
+            return response
     def initliaze_model(self):
         if self.model is None:
             config = AutoConfig.from_pretrained(os.path.abspath("./models"),context_length=self.MAX_LENGTH)
@@ -57,7 +62,7 @@ class CodeGen:
                 config=config
             )
 
-    def infer(self,user_prompt:str):
+    def infer(self,user_prompt:str,timeout: int):
         self.initliaze_model()
         generation_config = GenerationConfig(
             temperature=0.2,
@@ -72,7 +77,8 @@ class CodeGen:
             stop=["<|endoftext|>"],
         )
 
-        gen_word = self.generate(self.model,generation_config,user_prompt.strip())
+        gen_word = self.generate(self.model,generation_config,user_prompt.strip(),timeout)
+        
         return gen_word
 
     def __iter__(self):
@@ -82,10 +88,15 @@ class CodeGen:
             for word in self.model:
                 yield  word
 
+
+
     
 if __name__ == '__main__':
-    code_gen = CodeGen()
-    gen_word = code_gen.infer("write a python program to print hello world")
-    for word in gen_word:
-        print(word,end="",flush=True)
-    print("")
+    try:
+        code_gen = CodeGen()
+        gen_word = code_gen.infer("print hello world",10)
+        for word in gen_word:
+            print(word,end="",flush=True)
+        print("")
+    except Exception as e:
+        print(e)
