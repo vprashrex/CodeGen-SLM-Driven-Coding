@@ -14,7 +14,7 @@
   --outgoing-chat-bg: #343541;
   --incoming-chat-bg: #444654;
   --outgoing-chat-border: #343541;
-  --incoming-chat-border: #444654;
+  --incoming-chat-border: #343541;
 }
 .light-mode {
   --text-color: #343541;
@@ -28,6 +28,7 @@
 }
 body {
   background: var(--outgoing-chat-bg);
+
 }
 
 /* Chats container styling */
@@ -85,6 +86,27 @@ body {
   align-items: flex-start;
   justify-content: space-between;
 }
+
+.generate-response {
+  --tw-border-opacity: 1;
+  font-family: inherit;
+  position: absolute;
+  font-size: 20px;
+  color: #D9D9E3;
+  cursor: pointer;
+  left:45%;
+  bottom: 100%;
+  padding: 5px 10px;
+  border-radius: 0.25rem;
+  background: #343541;
+  font-size: 22px;
+  border: 1px solid rgb(86, 88, 105);
+}
+
+.generate-response:hover {
+  background: #444654;
+}
+
 span.material-symbols-rounded {
   user-select: none;
   cursor: pointer;
@@ -177,12 +199,12 @@ span.material-symbols-rounded {
   border: none;
   padding: 15px 45px 15px 20px;
   color: var(--text-color);
-  font-size: 1rem;
-  border-radius: 4px;
+  font-size: 15px;
+  border-radius: 14px;
   max-height: 250px;
   overflow-y: auto;
-  background: var(--incoming-chat-bg);
-  outline: 1px solid var(--incoming-chat-border);
+  background: #40414f;
+  outline: none;
 }
 .typing-textarea textarea::placeholder {
   color: var(--placeholder-color);
@@ -211,12 +233,13 @@ span.material-symbols-rounded {
 }
 .typing-controls span {
   margin-left: 7px;
-  font-size: 1.4rem;
-  background: var(--incoming-chat-bg);
-  outline: 1px solid var(--incoming-chat-border);
+  padding-bottom:3px;
 }
-.typing-controls span:hover {
-  background: var(--icon-hover-bg);
+
+
+#send-btn{
+  font-size: 16px;
+  cursor: pointer;
 }
 
 /* Reponsive Media Query */
@@ -252,7 +275,5 @@ span.material-symbols-rounded {
     width: 45px;
     margin-left: 5px;
   }
-  span.material-symbols-rounded {
-    font-size: 1.25rem!important;
-  }
+  
 }
