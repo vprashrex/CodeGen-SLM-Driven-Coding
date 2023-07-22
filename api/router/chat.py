@@ -1,14 +1,20 @@
-from fastapi import APIRouter,Depends
+from fastapi import APIRouter
 from api.pipeline import model_api
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 from fastapi.responses import StreamingResponse
 from api.schemas.chat_schema import ChatRequest
-from fastapi.responses import JSONResponse,Response
+from fastapi.responses import JSONResponse
 import io
 import sys
 import asyncio
-import concurrent.futures
+
+
+''''
+1. TIMEOUT EXECUTION
+2. USER INTERRUPTION
+3. REGENERATE RESPONSE
+'''
 
 router = APIRouter()
 model = model_api.CodeGen()
@@ -29,23 +35,44 @@ async def load_model() -> AsyncGenerator[model_api.CodeGen,None]:
     finally:
         pass
 
+
+from fastapi import status
+from api.custom_response import CustomJSONResponse
+from fastapi import HTTPException
+
 async def generate_word(prompt: str):
-    async with load_model() as model:
-        gen_word = model.infer(prompt,1)
-        for word in gen_word:
-            yield word
-        
-       
+    try:
+        async with load_model() as model:
+            loop = asyncio.get_event_loop()
+            future = loop.run_in_executor(None,model.infer,prompt)
+            gen_word = await asyncio.wait_for(future,1)
+            for word in gen_word:
+                yield word
+
+    except asyncio.TimeoutError:
+        raise HTTPException(
+            status_code=status.HTTP_408_REQUEST_TIMEOUT,
+            detail="TimeOut error: Model took so long to respond!"
+        )
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal Server error"
+        ) from e
+
 @router.post("/api/instruct_resp",tags=["chat"])
 async def generate(chat_request: ChatRequest):
     try:
         user_prompt = chat_request.prompt
 
-        return StreamingResponse(
-            generate_word(user_prompt),
-            status_code=200,
-            media_type="text/plain"
-        )
+        try:
+            words_gen = generate_word(user_prompt)
+            response = StreamingResponse(words_gen,status_code=200,media_type="text/plain")
+        except HTTPException as e:
+            response = JSONResponse(content={"error":e.detail},status_code=e.status_code)
+        return response
+
     except Exception as e:
         print(e)
         return JSONResponse(
