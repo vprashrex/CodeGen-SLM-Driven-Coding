@@ -1,4 +1,4 @@
-from sqlalchemy import Column,String,TIMESTAMP
+from sqlalchemy import Column,String,TIMESTAMP,DateTime
 from sqlalchemy.orm import declarative_base
 import uuid
 
@@ -14,7 +14,7 @@ class User(Base):
     msg_id = Column(String,primary_key=True,default=generate_uuid)
     ques = Column(String,nullable=False)
     ans = Column(String,nullable=False)
-    timestamp = Column(TIMESTAMP,nullable=False)
+    timestamp = Column(DateTime,nullable=False)
 
     def dict(self):
         return {

@@ -1,9 +1,7 @@
 <!DOCTYPE html>
-<!-- Coding By CodingNepal - www.codingnepalweb.com -->
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <title>ChatGPT Clone in JavaScript | CodingNepal</title>
     <link rel="stylesheet" href="../static/css/style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Google Fonts Link For Icons -->
@@ -18,6 +16,7 @@
       font-size: 24px;
       border: none;
       cursor: pointer;
+      margin-bottom:2px;
     }
 
     #chat-input::placeholder{
@@ -27,11 +26,10 @@
 
   </style>
 
+
   <body>
-    <!-- Chats container -->
     <div class="chat-container"></div>
     
-    <!-- Typing container -->
     <div class="typing-container">
       <div class="typing-content">
         <div class="typing-textarea">
@@ -43,6 +41,7 @@
               
           </span>
         </div>
+        
         <div class="typing-controls">
           <span id="delete-btn">
             <svg width="28" height="32" viewBox="0 0 28 32" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -53,6 +52,10 @@
               </svg>                            
           </span>
       </div>
+    </div>
+
+    <div class="response-model">
+          
     </div>
     
   </body>
