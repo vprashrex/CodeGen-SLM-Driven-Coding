@@ -42,7 +42,7 @@ const getChatResponse = async (incomingChatDiv) => {
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            prompt: "java "+userText,
+            prompt: userText,
         })
     }
     // Send POST request to API, get response and set the reponse as paragraph element text
