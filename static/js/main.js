@@ -6,10 +6,11 @@ const response_model_class = document.querySelector(".response-model")
 
 let userText = null;
 
-const loadDataFromLocalstorage = () => {
 
-   
-    
+
+
+const loadDataFromLocalstorage = () => {
+ 
     const defaultText = `<div class="default-text">
                             <h1>CodeGen: LLMDriven Coding</h1>
                             <p>This is a code instruct Model.</p>
@@ -41,7 +42,7 @@ const getChatResponse = async (incomingChatDiv) => {
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            prompt: userText,
+            prompt: "java "+userText,
         })
     }
     // Send POST request to API, get response and set the reponse as paragraph element text
@@ -81,6 +82,7 @@ const getChatResponse = async (incomingChatDiv) => {
 
         const reader = readableStreamResponse.body.getReader();
         while (true){
+            showResponse();
             const {done,value} = await reader.read();
             if (done){ // when  response is completed
                 const sendmsgoptions = {
@@ -109,19 +111,12 @@ const getChatResponse = async (incomingChatDiv) => {
         pElement.classList.add("error");
         pElement.textContent = error;
     }
-
-
-    // question : {userText} and answer: result
-
-    
-
-
-
     // Remove the typing animation, append the paragraph element and save the chats to local storage
     incomingChatDiv.querySelector(".typing-animation").remove();
     incomingChatDiv.querySelector(".chat-details").appendChild(pElement);
-    showResponse();
-    localStorage.setItem("all-chats", chatContainer.innerHTML);
+
+    
+    localStorage.setItem("all-chats", prash_text.innerHTML);
     chatContainer.scrollTo(0, chatContainer.scrollHeight);
 }
 
@@ -153,6 +148,31 @@ const showTypingAnimation = () => {
     chatContainer.scrollTo(0, chatContainer.scrollHeight);
     getChatResponse(incomingChatDiv);
     
+}
+
+function getCookieValue(cookieName) {
+    var cookieString = document.cookie;
+    var cookieArray = cookieString.split(';');
+
+    for (var i = 0; i < cookieArray.length; i++) {
+        var cookie = cookieArray[i].trim();
+        if (cookie.indexOf(cookieName + '=') === 0) {
+            return cookie.substring(cookieName.length + 1);
+        }
+    }
+
+    return null; // Cookie not found
+}
+
+const stopResponse = async () => {
+    const requestOptions = {
+        method: "POST",
+        headers: {
+            "Content-Type":"application/json",
+        }
+    }
+
+    await fetch("/api/stop",requestOptions)
 }
 
 const showResponse = () => {

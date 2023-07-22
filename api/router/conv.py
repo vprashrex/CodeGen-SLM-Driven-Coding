@@ -1,5 +1,17 @@
 '''
+
+jwt :
+
+conv_id
+time_stamp: for each conversation
+
+user_id
+last_session: timestamp
+
+
 get database handling here
+
+MESSAGE HANDLER
 
 TO DO THE FOLLOWING APPROACH CREATE
 
@@ -8,6 +20,8 @@ async def get_conv_id()
 
 TO DO:
 1. GET MY CONVERSATION ---> USE CONVERSATION ID TO FETCH THE ONE PARTICULAR CONVERSATION
+
+# jwt ---> [user_id,conv_id -- current_conv] --> store cookie
 2. GET CONVERSATION HISTORY ---> USE JWT TO GET ALL THE CONVERSATION OF THE PARTICULAR USER : IF USER LOGGED IN
 
 
@@ -48,6 +62,7 @@ async def get_conv_id(conv_id: str):
 from fastapi import APIRouter
 from pydantic import BaseModel
 from fastapi.responses import JSONResponse
+import uuid
 
 router = APIRouter()
 
@@ -55,17 +70,39 @@ class Conv(BaseModel):
     question: str
     answer: str
 
+async def gen_id():
+    return uuid.uuid4()
+
 # redis hset
 @router.post("/conv")
 async def get_conv(conv: Conv):
     try:
         question = conv.question
         ans = conv.answer
-        print(ans)
-        print(question)
+        print("question : {}".format(question))
 
     except Exception as e:
         return JSONResponse(
             content={"error":"error occured!"},
+            status_code=400
+        )
+
+@router.post("/conv/conv-title")
+async def gen_convtilte():
+    try:
+        '''
+        db.get(")
+        '''
+
+        conv_title = "hello world"
+        return JSONResponse(
+            content={"conv_title":conv_title},
+            status_code=200
+        )
+
+    except Exception as e:
+        print(e)
+        return JSONResponse(
+            content={"error":str(e)},
             status_code=400
         )
