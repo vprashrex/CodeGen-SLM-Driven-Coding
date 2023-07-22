@@ -18,6 +18,7 @@ import asyncio
 
 router = APIRouter()
 model = model_api.CodeGen()
+stop_generation = False
 
 async def stram_buffer(word:str):
     buffer = io.StringIO()
@@ -41,18 +42,21 @@ from api.custom_response import CustomJSONResponse
 from fastapi import HTTPException
 
 async def generate_word(prompt: str):
+    global stop_generation
     try:
         async with load_model() as model:
             loop = asyncio.get_event_loop()
             future = loop.run_in_executor(None,model.infer,prompt)
-            gen_word = await asyncio.wait_for(future,1)
+            gen_word = await asyncio.wait_for(future,120)
             for word in gen_word:
+                if stop_generation:
+                    break
                 yield word
-
+    
     except asyncio.TimeoutError:
         raise HTTPException(
             status_code=status.HTTP_408_REQUEST_TIMEOUT,
-            detail="TimeOut error: Model took so long to respond!"
+            detail={"Took too long to respond"}
         )
 
     except Exception as e:
@@ -61,17 +65,24 @@ async def generate_word(prompt: str):
             detail="Internal Server error"
         ) from e
 
+
+
 @router.post("/api/instruct_resp",tags=["chat"])
 async def generate(chat_request: ChatRequest):
     try:
         user_prompt = chat_request.prompt
+        stop_generation = False
+        return StreamingResponse(
+            generate_word(user_prompt),
+            status_code=200,
+            media_type="text/plain"
+        )
 
-        try:
-            words_gen = generate_word(user_prompt)
-            response = StreamingResponse(words_gen,status_code=200,media_type="text/plain")
-        except HTTPException as e:
-            response = JSONResponse(content={"error":e.detail},status_code=e.status_code)
-        return response
+    except HTTPException as e:
+        return CustomJSONResponse(
+            content={"error":e.detail},
+            status_code=e.status_code
+        )
 
     except Exception as e:
         print(e)
@@ -80,3 +91,12 @@ async def generate(chat_request: ChatRequest):
             content={"error":str(e)}
         )
         
+
+@router.post("/api/stop",tags=["chat"])
+async def stop_generation_end():
+    global stop_generation
+    stop_generation = True
+    return JSONResponse(
+        status_code=200,
+        content={"message":"Generation Stopped!"}
+    )

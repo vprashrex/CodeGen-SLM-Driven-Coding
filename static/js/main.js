@@ -2,6 +2,7 @@ const chatInput = document.querySelector("#chat-input");
 const sendButton = document.querySelector("#send-btn");
 const chatContainer = document.querySelector(".chat-container");
 const deleteButton = document.querySelector("#delete-btn");
+const response_model_class = document.querySelector(".response-model")
 
 let userText = null;
 
@@ -81,13 +82,25 @@ const getChatResponse = async (incomingChatDiv) => {
         const reader = readableStreamResponse.body.getReader();
         while (true){
             const {done,value} = await reader.read();
-            if (done){
+            if (done){ // when  response is completed
+                const sendmsgoptions = {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        question: userText,
+                        answer: result
+                    })
+                }
+            
+                await fetch("/conv",sendmsgoptions);
                 break;
             }
 
             result += decoder.decode(value);
             
-            pElement.textContent = result;
+            pElement.textContent = result;  
             incomingChatDiv.querySelector(".chat-details").appendChild(pElement);
 
         }
@@ -98,10 +111,16 @@ const getChatResponse = async (incomingChatDiv) => {
     }
 
 
+    // question : {userText} and answer: result
+
+    
+
+
 
     // Remove the typing animation, append the paragraph element and save the chats to local storage
     incomingChatDiv.querySelector(".typing-animation").remove();
     incomingChatDiv.querySelector(".chat-details").appendChild(pElement);
+    showResponse();
     localStorage.setItem("all-chats", chatContainer.innerHTML);
     chatContainer.scrollTo(0, chatContainer.scrollHeight);
 }
@@ -126,12 +145,24 @@ const showTypingAnimation = () => {
                         </div>
                     </div>
                     <span onclick="copyResponse(this)" class="material-symbols-rounded">content_copy</span>
-                </div>`;
+                </div>
+                `;
     // Create an incoming chat div with typing animation and append it to chat container
     const incomingChatDiv = createChatElement(html, "incoming");
     chatContainer.appendChild(incomingChatDiv);
     chatContainer.scrollTo(0, chatContainer.scrollHeight);
     getChatResponse(incomingChatDiv);
+    
+}
+
+const showResponse = () => {
+    const html = `
+        <div class="generate-response">
+            <span onclick="stopResponse(this)">Stop Generation</span>
+        </div>
+    `;
+    const responseModel = createChatElement(html,"responses");
+    response_model_class.appendChild(responseModel);
 }
 
 const handleOutgoingChat = () => {

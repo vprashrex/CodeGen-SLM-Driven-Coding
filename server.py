@@ -34,9 +34,10 @@ def init_app():
         return templates.TemplateResponse("index.html",context={"request":request})
 
 
-    from api.router import chat
+    from api.router import chat,conv
 
     app.include_router(chat.router)
+    app.include_router(conv.router)
 
     return app
 
