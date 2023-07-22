@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+""" from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import sessionmaker
@@ -57,4 +57,4 @@ if __name__ == '__main__':
     r = JWTRepo(data)
     print(r.generate_token())
     encode_token = r.generate_token()
-    print(r.extract_token(encode_token))
+    print(r.extract_token(encode_token)) """
