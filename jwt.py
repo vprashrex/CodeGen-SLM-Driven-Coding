@@ -58,5 +58,3 @@ if __name__ == '__main__':
     print(r.generate_token())
     encode_token = r.generate_token()
     print(r.extract_token(encode_token))
-
-    response.set_cookie("key",encoded_token)

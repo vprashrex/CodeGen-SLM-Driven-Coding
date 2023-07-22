@@ -46,7 +46,16 @@ TO DO:
 
 '''
 
+'''
 
+schema 
+
+class Conversation:
+    conv_id: str(uuid.uuid4())
+    conv_title: first_question
+    q/a: [{q:a},{q:a},{q:a}] 
+    datetime: timestamp
+'''
 
 '''
 const conv_id = cookie.get(conv_id)
@@ -87,16 +96,15 @@ async def get_conv(conv: Conv):
             status_code=400
         )
 
-@router.post("/conv/conv-title")
+@router.post("/conv/conv-title/{conv_id}")
 async def gen_convtilte():
     try:
         '''
-        db.get(")
+        fetch conv_title from the database using conv_id
+        and send it to the response as conv_title
         '''
-
-        conv_title = "hello world"
         return JSONResponse(
-            content={"conv_title":conv_title},
+            content={"conv_title":"conv_title"},
             status_code=200
         )
 
