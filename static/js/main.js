@@ -42,7 +42,7 @@ const getChatResponse = async (incomingChatDiv) => {
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            prompt: "java "+userText,
+            prompt: userText,
         })
     }
     // Send POST request to API, get response and set the reponse as paragraph element text
@@ -81,8 +81,8 @@ const getChatResponse = async (incomingChatDiv) => {
         let result = "";
 
         const reader = readableStreamResponse.body.getReader();
+        console.log(reader);
         while (true){
-            showResponse();
             const {done,value} = await reader.read();
             if (done){ // when  response is completed
                 const sendmsgoptions = {
@@ -116,7 +116,7 @@ const getChatResponse = async (incomingChatDiv) => {
     incomingChatDiv.querySelector(".chat-details").appendChild(pElement);
 
     
-    localStorage.setItem("all-chats", prash_text.innerHTML);
+    localStorage.setItem("all-chats", chatContainer.innerHTML);
     chatContainer.scrollTo(0, chatContainer.scrollHeight);
 }
 
@@ -150,19 +150,6 @@ const showTypingAnimation = () => {
     
 }
 
-function getCookieValue(cookieName) {
-    var cookieString = document.cookie;
-    var cookieArray = cookieString.split(';');
-
-    for (var i = 0; i < cookieArray.length; i++) {
-        var cookie = cookieArray[i].trim();
-        if (cookie.indexOf(cookieName + '=') === 0) {
-            return cookie.substring(cookieName.length + 1);
-        }
-    }
-
-    return null; // Cookie not found
-}
 
 const stopResponse = async () => {
     const requestOptions = {

@@ -19,7 +19,9 @@ import uuid
 
 router = APIRouter()
 model = model_api.CodeGen()
-stop_generation = False
+
+stop_flags = {}
+
 
 async def stram_buffer(word:str):
     buffer = io.StringIO()
@@ -52,6 +54,8 @@ async def generate_word(prompt: str):
             future = loop.run_in_executor(None,model.infer,prompt)
             gen_word = await asyncio.wait_for(future,120)
             for word in gen_word:
+                if stop_flags["stop"]:
+                    break 
                 yield word
     
     except asyncio.TimeoutError:
@@ -70,9 +74,7 @@ async def generate_word(prompt: str):
 async def generate(chat_request: ChatRequest):
     try:
         user_prompt = chat_request.prompt
-        ''' stop_event = Event()
-        stop_flags["client_id"] = stop_event '''
-        print(user_prompt)
+        stop_flags["stop"] = False
         response = StreamingResponse(
             generate_word(user_prompt),
             status_code=200,
@@ -96,10 +98,9 @@ async def generate(chat_request: ChatRequest):
         
 
 @router.post("/api/stop/",tags=["chat"])
-async def stop_generation_end():
+async def stop_generation():
     try:
-        stop_event = stop_flags.get("client_id")
-        
+        stop_flags["stop"] = True
         return JSONResponse(
             status_code=200,
             content={"message":"Generation Stopped!"}

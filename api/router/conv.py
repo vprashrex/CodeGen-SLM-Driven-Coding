@@ -73,7 +73,7 @@ class Conv(BaseModel):
 async def gen_id():
     return uuid.uuid4()
 
-# redis hset
+''' # redis hset
 @router.post("/conv")
 async def get_conv(conv: Conv):
     try:
@@ -90,10 +90,7 @@ async def get_conv(conv: Conv):
 @router.post("/conv/conv-title")
 async def gen_convtilte():
     try:
-        '''
-        db.get(")
-        '''
-
+        
         conv_title = "hello world"
         return JSONResponse(
             content={"conv_title":conv_title},
@@ -105,4 +102,4 @@ async def gen_convtilte():
         return JSONResponse(
             content={"error":str(e)},
             status_code=400
-        )
+        ) '''
