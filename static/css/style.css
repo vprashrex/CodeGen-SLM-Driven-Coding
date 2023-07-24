@@ -104,10 +104,13 @@ body {
   user-select: none;
 }
 
+.hidden{
+  display:none;
+}
+
 .generate-response:hover {
   background: #444654;
 }
-
 span.material-symbols-rounded {
   user-select: none;
   cursor: pointer;

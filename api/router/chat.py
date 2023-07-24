@@ -4,11 +4,11 @@ from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 from fastapi.responses import StreamingResponse
 from api.schemas.chat_schema import ChatRequest
+from api.router import word_get
 from fastapi.responses import JSONResponse
 import io
 import sys
 import asyncio
-import uuid
 
 
 ''''
@@ -20,7 +20,7 @@ import uuid
 router = APIRouter()
 model = model_api.CodeGen()
 
-stop_flags = {}
+
 
 
 async def stram_buffer(word:str):
@@ -43,38 +43,41 @@ async def load_model() -> AsyncGenerator[model_api.CodeGen,None]:
 from fastapi import status
 from api.custom_response import CustomJSONResponse
 from fastapi import HTTPException
-from threading import Event
+import threading
 
-stop_flags = {}
+stop = threading.Event()
+s = {}
+
 async def generate_word(prompt: str):
-    global stop_flags
+    global stop
     try:
         async with load_model() as model:
             loop = asyncio.get_event_loop()
-            future = loop.run_in_executor(None,model.infer,prompt)
-            gen_word = await asyncio.wait_for(future,120)
+            future = loop.run_in_executor(None, model.infer, prompt)
+            gen_word = await asyncio.wait_for(future, 120)
             for word in gen_word:
-                if stop_flags["stop"]:
-                    break 
+                if s["stop"]:
+                    break
+                await asyncio.sleep(0.01)
                 yield word
-    
     except asyncio.TimeoutError:
         raise HTTPException(
             status_code=status.HTTP_408_REQUEST_TIMEOUT,
             detail={"Took too long to respond"}
         )
-
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal Server error"
         ) from e
 
-@router.post("/api/instruct_resp",tags=["chat"])
+@router.post("/api/instruct_resp", tags=["chat"])
 async def generate(chat_request: ChatRequest):
     try:
         user_prompt = chat_request.prompt
-        stop_flags["stop"] = False
+        #stop.clear()
+        s["stop"] = False
+
         response = StreamingResponse(
             generate_word(user_prompt),
             status_code=200,
@@ -85,29 +88,27 @@ async def generate(chat_request: ChatRequest):
 
     except HTTPException as e:
         return CustomJSONResponse(
-            content={"error":e.detail},
+            content={"error": e.detail},
             status_code=e.status_code
         )
-
     except Exception as e:
         print(e)
         return JSONResponse(
             status_code=200,
-            content={"error":str(e)}
+            content={"error": str(e)}
         )
-        
 
-@router.post("/api/stop/",tags=["chat"])
-async def stop_generation():
+@router.post("/api/stop", tags=["chat"])
+async def stop_generation_endpoint():
     try:
-        stop_flags["stop"] = True
+        s["stop"] = True
         return JSONResponse(
             status_code=200,
-            content={"message":"Generation Stopped!"}
+            content={"message": "Generation Stopped!"}
         )
     except Exception as e:
         print(e)
         return JSONResponse(
-            content={"error":str(e)},
+            content={"error": str(e)},
             status_code=200
         )

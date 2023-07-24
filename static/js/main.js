@@ -81,25 +81,14 @@ const getChatResponse = async (incomingChatDiv) => {
         let result = "";
 
         const reader = readableStreamResponse.body.getReader();
-        console.log(reader);
+        
         while (true){
+            /* showResponse(); */
             const {done,value} = await reader.read();
             if (done){ // when  response is completed
-                const sendmsgoptions = {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        question: userText,
-                        answer: result
-                    })
-                }
-            
-                await fetch("/conv",sendmsgoptions);
                 break;
             }
-
+            
             result += decoder.decode(value);
             
             pElement.textContent = result;  
@@ -151,26 +140,55 @@ const showTypingAnimation = () => {
 }
 
 
-const stopResponse = async () => {
+const stopResponse = () => {
     const requestOptions = {
         method: "POST",
         headers: {
-            "Content-Type":"application/json",
+            "Content-Type": "application/json",
         }
-    }
+    };
+    
+    $.ajax({
+        url: "/api/stop",
+        type: requestOptions.method,
+        headers: requestOptions.headers,
+        dataType: "json",
+        success: function(response) {
+            // Handle the successful response here
+            console.log(response);
+        },
+        error: function(xhr, status, error) {
+            // Handle errors here
+            console.error(status, error);
+        }
+    });
+    console.log("yes!")
+    
+}
 
-    await fetch("/api/stop",requestOptions)
+
+const hideResponse = () => {
+    response_model_class.classList.add("hidden");
 }
 
 const showResponse = () => {
     const html = `
-        <div class="generate-response">
+        <div class="generate-response" id="stop">
             <span onclick="stopResponse(this)">Stop Generation</span>
         </div>
+        
     `;
+
+    if (response_model_class.classList.contains("hidden")){
+        response_model_class.classList.remove("hidden");
+    }
+
     const responseModel = createChatElement(html,"responses");
     response_model_class.appendChild(responseModel);
 }
+
+showResponse();
+
 
 const handleOutgoingChat = () => {
     userText = chatInput.value.trim(); // Get chatInput value and remove extra spaces
@@ -200,6 +218,7 @@ deleteButton.addEventListener("click", () => {
     if(confirm("Are you sure you want to delete all the chats?")) {
         localStorage.removeItem("all-chats");
         loadDataFromLocalstorage();
+        hideResponse();
     }
 });
 
