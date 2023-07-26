@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
+import redis
 
 origins = [
     "*"
@@ -10,9 +11,7 @@ origins = [
 
 
 def init_app():
-    '''
-    initliaze db here
-    '''
+
 
     VERSION = "0.1"
     

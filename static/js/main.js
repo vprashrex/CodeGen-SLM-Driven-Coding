@@ -95,6 +95,8 @@ const getChatResponse = async (incomingChatDiv) => {
                         answer: result
                     })
                 }
+                //console.log(question)
+                //console.log(answer)
             
                 await fetch("/conv",sendmsgoptions);
                 break;
@@ -108,11 +110,8 @@ const getChatResponse = async (incomingChatDiv) => {
         }
         
     } catch (error) { // Add error class to the paragraph element and set error text
-<<<<<<< HEAD
-=======
         pElement.classList.add("error");
         pElement.textContent = "Oops! Something went wrong while retrieving the response. Please try again.";
->>>>>>> 2e2dfaacc7aec58b6835c4fb454002c1049ceeac
         pElement.classList.add("error");
         pElement.textContent = error;
     }

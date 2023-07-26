@@ -68,10 +68,16 @@ async def get_conv_id(conv_id: str):
 '''
 
 
-from fastapi import APIRouter
+import asyncio
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from fastapi.responses import JSONResponse
 import uuid
+import datetime
+import json
+import redis
+
+r = redis.StrictRedis(host='localhost', port=6379, db=0)
 
 router = APIRouter()
 
@@ -83,12 +89,30 @@ async def gen_id():
     return uuid.uuid4()
 
 # redis hset
+qaList = []
 @router.post("/conv")
 async def get_conv(conv: Conv):
     try:
+        conv_id = await gen_id()
+        str_conv_id = str(conv_id)
         question = conv.question
         ans = conv.answer
-        print("question : {}".format(question))
+        qa = {question:ans}
+        qaList.append(qa)
+        dtime = datetime.datetime.now()
+        dtime = dtime.strftime("%d/%m/%Y, %H:%M:%S")
+        print(qaList)
+        print(str_conv_id)
+
+        qaList_json = json.dumps(qaList)
+        
+        session_key = f"session:{str_conv_id}"
+
+        r.hset(session_key, mapping={
+            'conv_id':str_conv_id,
+            'qa':qaList_json,
+            'time':dtime
+        })
 
     except Exception as e:
         return JSONResponse(
@@ -96,17 +120,24 @@ async def get_conv(conv: Conv):
             status_code=400
         )
 
-@router.post("/conv/conv-title/{conv_id}")
-async def gen_convtilte():
+@router.post("/conv/conv-title/{str_conv_id}")
+async def gen_convtilte(str_conv_id:str):
     try:
-        '''
-        fetch conv_title from the database using conv_id
-        and send it to the response as conv_title
-        '''
+        session_key = f"session:{str_conv_id}"
+        session_data = r.hget(session_key, 'qa')
+        print(str_conv_id)
+        #session_data_str = json.loads(session_data)
+        #session_data_str = {k.decode():v.decode() for k,v in session_data.items()}
+
+
+        if not session_data:
+            raise HTTPException(status_code=404, detail="Session not found")
+    
         return JSONResponse(
-            content={"conv_title":"conv_title"},
-            status_code=200
+            content = {"qa":session_data},
+            status_code = 200
         )
+
 
     except Exception as e:
         print(e)
@@ -114,3 +145,17 @@ async def gen_convtilte():
             content={"error":str(e)},
             status_code=400
         )
+    
+@router.get("/con/{str_conv_id}")
+async def get_data(str_conv_id: str):
+    session_key = f"session:{str_conv_id}"
+    session_data = r.hgetall(session_key)
+    session_data_str = {k.decode():v.decode() for k,v in session_data.items()}
+
+    if not session_data_str:
+        raise HTTPException(status_code=404, detail="Session not found")
+    
+    return JSONResponse(
+        content = {"message":session_data_str},
+        status_code = 200
+    )
