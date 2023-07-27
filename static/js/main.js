@@ -50,6 +50,11 @@ const createChatElement = (content, className) => {
 const getChatResponse = async (incomingChatDiv) => {
     const API_URL = "api/instruct_resp";
     const pElement = document.createElement("p");
+
+    if (document.getElementById("restart")){
+        hideRestart();
+    }
+    
     showResponse();
     showAnimation();
     
@@ -179,14 +184,16 @@ const stopResponse = () => {
 }
 
 
-const hideResponse = () => {
-
+const hideResponse = () => 
+{
     response_model_class.classList.add("hidden");
 }
 
 const hideRestart = () => {
-    document.getElementById("restart-responses")[0].classList.add("hidden");
+    document.getElementById("restart").classList.add("hidden");
 }
+
+
 
 const showResponse = () => {
     const html = `
@@ -280,7 +287,7 @@ const restart_generation = async () => {
 
 const restartResponse = () =>{
     const html = `
-        <div class="generate-response" id="stop">
+        <div class="generate-response" id="restart">
             <span onclick="restart_generation()">Restart Response</span>
         </div>  
     `;
