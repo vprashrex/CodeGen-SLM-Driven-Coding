@@ -4,12 +4,10 @@ from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 from fastapi.responses import StreamingResponse
 from api.schemas.chat_schema import ChatRequest
-from api.router import word_get
 from fastapi.responses import JSONResponse
 import io
 import sys
 import asyncio
-
 
 ''''
 1. TIMEOUT EXECUTION
@@ -44,6 +42,8 @@ from fastapi import status
 from api.custom_response import CustomJSONResponse
 from fastapi import HTTPException
 import threading
+from api.router import word_get
+
 
 stop = threading.Event()
 s = {}
@@ -51,7 +51,15 @@ s = {}
 async def generate_word(prompt: str):
     global stop
     try:
-        async with load_model() as model:
+
+        words = list(word_get.words.split( ))
+        for word in words:
+            await asyncio.sleep(0.01)
+            if s["stop"]:
+                break
+            yield f"{word} "
+
+        ''' async with load_model() as model:
             loop = asyncio.get_event_loop()
             future = loop.run_in_executor(None, model.infer, prompt)
             gen_word = await asyncio.wait_for(future, 120)
@@ -59,7 +67,7 @@ async def generate_word(prompt: str):
                 if s["stop"]:
                     break
                 await asyncio.sleep(0.01)
-                yield word
+                yield word '''
     except asyncio.TimeoutError:
         raise HTTPException(
             status_code=status.HTTP_408_REQUEST_TIMEOUT,
@@ -73,6 +81,34 @@ async def generate_word(prompt: str):
 
 @router.post("/api/instruct_resp", tags=["chat"])
 async def generate(chat_request: ChatRequest):
+    try:
+        user_prompt = chat_request.prompt
+        #stop.clear()
+        s["stop"] = False
+
+        response = StreamingResponse(
+            generate_word(user_prompt),
+            status_code=200,
+            media_type="text/plain"
+        )
+
+        return response
+
+    except HTTPException as e:
+        return CustomJSONResponse(
+            content={"error": e.detail},
+            status_code=e.status_code
+        )
+    except Exception as e:
+        print(e)
+        return JSONResponse(
+            status_code=200,
+            content={"error": str(e)}
+        )
+
+
+@router.post("/api/restart")
+async def restart_generation(chat_request: ChatRequest):
     try:
         user_prompt = chat_request.prompt
         #stop.clear()
@@ -112,3 +148,4 @@ async def stop_generation_endpoint():
             content={"error": str(e)},
             status_code=200
         )
+
