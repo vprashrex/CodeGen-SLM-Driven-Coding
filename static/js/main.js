@@ -10,6 +10,18 @@ const going = {
 };
 
 
+const hideAnimation = () =>{
+    document.getElementById("key-animation").style.visibility = "hidden";
+    document.getElementById("send-btn").style.visibility = "visible";
+}
+const showAnimation = () =>{
+    document.getElementById("key-animation").style.visibility = "visible";
+    document.getElementById("send-btn").style.visibility = "hidden";
+}
+
+hideAnimation();
+
+
 
 const loadDataFromLocalstorage = () => {
  
@@ -39,10 +51,12 @@ const getChatResponse = async (incomingChatDiv) => {
     const API_URL = "api/instruct_resp";
     
     const pElement = document.createElement("p");
+
     pElement.classList.add(`chat-${count}`);
     
     count+=1;
     showResponse();
+    showAnimation();
     
     const requestOptions = {
         method: "POST",
@@ -85,6 +99,7 @@ const getChatResponse = async (incomingChatDiv) => {
             going.chat = true;
             if (done){
                 going.chat = false;
+                hideAnimation();
                 break;
             }
             result += decoder.decode(value);
@@ -201,6 +216,7 @@ const restart_generation = async () => {
     });
 
     showResponse();
+    showAnimation();
     const requestOptions = {
         method: "POST",
         headers: {
@@ -243,6 +259,7 @@ const restart_generation = async () => {
                 chatDetailsDiv.appendChild(pElement);
                 localStorage.setItem("all-chats", chatContainer.innerHTML);
                 chatContainer.scrollTo(0, chatContainer.scrollHeight);
+                hideAnimation();
                 break;
             }
             result += decoder.decode(value);
