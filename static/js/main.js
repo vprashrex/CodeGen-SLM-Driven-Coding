@@ -4,6 +4,7 @@ const chatContainer = document.querySelector(".chat-container");
 const deleteButton = document.querySelector("#delete-btn");
 const response_model_class = document.querySelector(".response-model")
 
+let count = localStorage.getItem("chat-count") || 0;
 let userText = null;
 const going = {
     chat:false
@@ -45,16 +46,10 @@ const createChatElement = (content, className) => {
     return chatDiv; // Return the created chat div
 }
 
-let count = 1;
   
 const getChatResponse = async (incomingChatDiv) => {
     const API_URL = "api/instruct_resp";
-    
     const pElement = document.createElement("p");
-
-    pElement.classList.add(`chat-${count}`);
-    
-    count+=1;
     showResponse();
     showAnimation();
     
@@ -148,8 +143,12 @@ const showTypingAnimation = () => {
 
     // Create an incoming chat div with typing animation and append it to chat container
     const incomingChatDiv = createChatElement(html, "incoming");
+    count++;
+    localStorage.setItem("chat-count",count);
     chatContainer.appendChild(incomingChatDiv);
-    chatContainer.scrollTo(0, chatContainer.scrollHeight);
+    sessionStorage.setItem("chat_count",`chat-${count}`);
+    incomingChatDiv.classList.add(`chat-${count}`)
+    chatContainer.scrollTo(0,chatContainer.scrollHeight);
     getChatResponse(incomingChatDiv);
     
 }
@@ -169,8 +168,6 @@ const stopResponse = () => {
         headers: requestOptions.headers,
         dataType: "json",
         success: function(response) {
-            // Handle the successful response here
-            console.log(response);
             restartResponse();
         },
         error: function(xhr, status, error) {
@@ -183,7 +180,12 @@ const stopResponse = () => {
 
 
 const hideResponse = () => {
+
     response_model_class.classList.add("hidden");
+}
+
+const hideRestart = () => {
+    document.getElementById("restart-responses")[0].classList.add("hidden");
 }
 
 const showResponse = () => {
@@ -201,20 +203,19 @@ const showResponse = () => {
 
 const restart_generation = async () => {
     const API_URL = "api/restart";
-    
-    const incomingChatDiv = document.querySelector(".chat.incoming");
-    incomingChatDiv.classList.add(`chat-${count}`);
+    const chat_count = `.chat.incoming.chat-${localStorage.getItem("chat-count")}`;
+    const incomingChatDiv = document.querySelector(chat_count);
 
     const chatDetailsDiv = incomingChatDiv.querySelector(".chat-details");
+   
     const existingParagraphs = chatDetailsDiv.querySelectorAll("p");
     
     const pElement = document.createElement("p");
-    pElement.classList.add(`chat-${count}`);
     
     existingParagraphs.forEach((paragraph) => {
         chatDetailsDiv.removeChild(paragraph);
     });
-
+    hideRestart();
     showResponse();
     showAnimation();
     const requestOptions = {
@@ -277,20 +278,17 @@ const restart_generation = async () => {
 };
 
 
-
 const restartResponse = () =>{
     const html = `
         <div class="generate-response" id="stop">
             <span onclick="restart_generation()">Restart Response</span>
         </div>  
     `;
-    if (response_model_class.classList.contains("hidden")){
-        response_model_class.classList.remove("hidden");
-    }
-
+   
     const responseModel = createChatElement(html,"restart-responses");
     response_model_class.appendChild(responseModel);   
 }
+
 
 const handleOutgoingChat = () => {
     userText = chatInput.value.trim(); // Get chatInput value and remove extra spaces
@@ -302,7 +300,7 @@ const handleOutgoingChat = () => {
 
     const html = `<div class="chat-content">
                     <div class="chat-details">
-                        <svg xmlns="http://www.w3.org/2000/svg" height="1.5em" viewBox="0 0 448 512" class=user_icon><style>.user_icon{fill:#ffffff}</style><path d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z"/></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" height="1.5em" viewBox="0 0 448 512" class=user_icon><style>.user_icon{fill:#ffffff;}</style><path d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z"/></svg>
                         <p>${userText}</p>
                     </div>
                 </div>`;
@@ -319,8 +317,10 @@ deleteButton.addEventListener("click", () => {
     // Remove the chats from local storage and call loadDataFromLocalstorage function
     if(confirm("Are you sure you want to delete all the chats?")) {
         localStorage.removeItem("all-chats");
+        localStorage.removeItem("chat-count");
         loadDataFromLocalstorage();
         hideResponse();
+        count=0;
     }
 });
 
