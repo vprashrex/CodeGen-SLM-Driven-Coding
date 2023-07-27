@@ -104,15 +104,11 @@ async def get_conv(conv: Conv):
         print(qaList)
         print(str_conv_id)
 
-        qaList_json = json.dumps(qaList)
+        Conv_json = json.dumps({"qalist":qaList,"conv_id":str_conv_id,"time":dtime})
         
         session_key = f"session:{str_conv_id}"
 
-        r.hset(session_key, mapping={
-            'conv_id':str_conv_id,
-            'qa':qaList_json,
-            'time':dtime
-        })
+        r.lpush(session_key, Conv_json)
 
     except Exception as e:
         return JSONResponse(
@@ -148,10 +144,9 @@ async def gen_convtilte(str_conv_id:str):
 @router.get("/con/{str_conv_id}")
 async def get_data(str_conv_id: str):
     session_key = f"session:{str_conv_id}"
-    session_data = r.hgetall(session_key)
-    session_data_str = dict(session_data)
-    #session_data_str = {k.decode():json.loads(v.decode()) for (k,v) in session_data.items()}
-    session_data_str = {k.decode('utf-8'):v.decode('utf-8') for (k,v) in session_data.items()}
+    session_data = r.lrange(session_key,0,0)[0]
+    session_data = session_data.decode("utf-8")
+    session_data_str = json.loads(session_data)
     print(session_data_str)
 
     if not session_data_str:
