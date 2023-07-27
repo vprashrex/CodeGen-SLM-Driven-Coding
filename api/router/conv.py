@@ -120,21 +120,20 @@ async def get_conv(conv: Conv):
             status_code=400
         )
 
-@router.post("/conv/conv-title/{str_conv_id}")
+@router.get("/conv/conv-title/{str_conv_id}")
 async def gen_convtilte(str_conv_id:str):
     try:
         session_key = f"session:{str_conv_id}"
         session_data = r.hget(session_key, 'qa')
-        print(str_conv_id)
-        #session_data_str = json.loads(session_data)
-        #session_data_str = {k.decode():v.decode() for k,v in session_data.items()}
-
+        session_data = json.loads(session_data.decode('utf-8'))[0]
+        session_data = dict(session_data)
+        conv_title = [k for (k,v) in session_data.items()][0]
 
         if not session_data:
             raise HTTPException(status_code=404, detail="Session not found")
     
         return JSONResponse(
-            content = {"qa":session_data},
+            content = {"conv_title":conv_title},
             status_code = 200
         )
 
@@ -150,7 +149,10 @@ async def gen_convtilte(str_conv_id:str):
 async def get_data(str_conv_id: str):
     session_key = f"session:{str_conv_id}"
     session_data = r.hgetall(session_key)
-    session_data_str = {k.decode():v.decode() for k,v in session_data.items()}
+    session_data_str = dict(session_data)
+    #session_data_str = {k.decode():json.loads(v.decode()) for (k,v) in session_data.items()}
+    session_data_str = {k.decode('utf-8'):v.decode('utf-8') for (k,v) in session_data.items()}
+    print(session_data_str)
 
     if not session_data_str:
         raise HTTPException(status_code=404, detail="Session not found")
