@@ -147,7 +147,7 @@ async def get_data(str_conv_id: str):
     session_data = r.lrange(session_key,0,0)[0]
     session_data = session_data.decode("utf-8")
     session_data_str = json.loads(session_data)
-    print(session_data_str)
+    print(session_data_str) 
 
     if not session_data_str:
         raise HTTPException(status_code=404, detail="Session not found")
