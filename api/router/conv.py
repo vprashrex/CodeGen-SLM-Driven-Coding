@@ -68,7 +68,6 @@ async def get_conv_id(conv_id: str):
 '''
 
 
-import asyncio
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from fastapi.responses import JSONResponse
@@ -76,6 +75,7 @@ import uuid
 import datetime
 import json
 import redis
+import jwt
 
 r = redis.StrictRedis(host='localhost', port=6379, db=0)
 
@@ -101,58 +101,24 @@ async def get_conv(conv: Conv):
         qaList.append(qa)
         dtime = datetime.datetime.now()
         dtime = dtime.strftime("%d/%m/%Y, %H:%M:%S")
+
+        first_qa = qaList[0]
+        conv_title = next(iter(first_qa))
+
+        print(conv_title)
         print(qaList)
         print(str_conv_id)
 
-        Conv_json = json.dumps({"qalist":qaList,"conv_id":str_conv_id,"time":dtime})
+        Conv_json = json.dumps({"qalist":qaList,"conv_id":str_conv_id,"conv_title":conv_title,"time":dtime})
         
         session_key = f"session:{str_conv_id}"
 
         r.lpush(session_key, Conv_json)
 
-    except Exception as e:
-        return JSONResponse(
-            content={"error":"error occured!"},
-            status_code=400
-        )
-
-@router.get("/conv/conv-title/{str_conv_id}")
-async def gen_convtilte(str_conv_id:str):
-    try:
-        session_key = f"session:{str_conv_id}"
-        session_data = r.hget(session_key, 'qa')
-        session_data = json.loads(session_data.decode('utf-8'))[0]
-        session_data = dict(session_data)
-        conv_title = [k for (k,v) in session_data.items()][0]
-
-        if not session_data:
-            raise HTTPException(status_code=404, detail="Session not found")
-    
-        return JSONResponse(
-            content = {"conv_title":conv_title},
-            status_code = 200
-        )
-
+        data = {"conv_id":str_conv_id, "conv_title":conv_title, "time":dtime, "exp":datetime.datetime.utcnow()+ datetime.timedelta(hours=1)}
+        secret_key = "9d38ddb8d95d5e3b6efc132b8da4a30281024696a74e385806b168c9195b26de"
+        token = jwt.encode(data, secret_key, algorithm="HS256")
+        print("JWT Token is: ",token)
 
     except Exception as e:
         print(e)
-        return JSONResponse(
-            content={"error":str(e)},
-            status_code=400
-        )
-    
-@router.get("/con/{str_conv_id}")
-async def get_data(str_conv_id: str):
-    session_key = f"session:{str_conv_id}"
-    session_data = r.lrange(session_key,0,0)[0]
-    session_data = session_data.decode("utf-8")
-    session_data_str = json.loads(session_data)
-    print(session_data_str) 
-
-    if not session_data_str:
-        raise HTTPException(status_code=404, detail="Session not found")
-    
-    return JSONResponse(
-        content = {"message":session_data_str},
-        status_code = 200
-    )
