@@ -63,43 +63,27 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 from fastapi.responses import JSONResponse
 import uuid
+from fastapi import Request
 
 router = APIRouter()
 
 class Conv(BaseModel):
     question: str
     answer: str
+    html: str
 
 async def gen_id():
     return uuid.uuid4()
 
-''' # redis hset
-@router.post("/conv")
-async def get_conv(conv: Conv):
+
+@router.post("/conv/")
+async def conv_html(file:dict,request:Request):
     try:
-        question = conv.question
-        ans = conv.answer
-        print("question : {}".format(question))
-
-    except Exception as e:
-        return JSONResponse(
-            content={"error":"error occured!"},
-            status_code=400
-        )
-
-@router.post("/conv/conv-title")
-async def gen_convtilte():
-    try:
-        
-        conv_title = "hello world"
-        return JSONResponse(
-            content={"conv_title":conv_title},
-            status_code=200
-        )
-
+        pass
+        #print(file)
     except Exception as e:
         print(e)
         return JSONResponse(
-            content={"error":str(e)},
+            content={"success":False},
             status_code=400
-        ) '''
+        )

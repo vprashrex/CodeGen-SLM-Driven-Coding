@@ -2,7 +2,8 @@ const chatInput = document.querySelector("#chat-input");
 const sendButton = document.querySelector("#send-btn");
 const chatContainer = document.querySelector(".chat-container");
 const deleteButton = document.querySelector("#delete-btn");
-const response_model_class = document.querySelector(".response-model")
+const response_model_class = document.querySelector(".response-model");
+const restart_response_model = document.querySelector(".restart-response-model");
 
 let count = localStorage.getItem("chat-count") || 0;
 let userText = null;
@@ -33,17 +34,18 @@ const loadDataFromLocalstorage = () => {
                         </div>`
 
     chatContainer.innerHTML = localStorage.getItem("all-chats") || defaultText;
-    chatContainer.scrollTo(0, chatContainer.scrollHeight); // Scroll to bottom of the chat container
+    chatContainer.scrollTo(0, chatContainer.scrollHeight);
 
 }
 
 
+
+
 const createChatElement = (content, className) => {
-    // Create new div and apply chat, specified class and set html content of div
     const chatDiv = document.createElement("div");
     chatDiv.classList.add("chat", className);
     chatDiv.innerHTML = content;
-    return chatDiv; // Return the created chat div
+    return chatDiv;
 }
 
   
@@ -100,17 +102,31 @@ const getChatResponse = async (incomingChatDiv) => {
             if (done){
                 going.chat = false;
                 hideAnimation();
+                const sendmsgoptions = {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        question: userText,
+                        answer: result,
+                        html: chatContainer.innerHTML
+                    })
+                }
+            
+                await fetch("/conv",sendmsgoptions);
                 break;
+
+                
             }
             result += decoder.decode(value);
             pElement.textContent = result;  
             incomingChatDiv.querySelector(".chat-details").appendChild(pElement);
         }
-    } catch (error) { // Add error class to the paragraph element and set error text
+    } catch (error) { 
         pElement.classList.add("error");
         pElement.textContent = error;
     }
-    // Remove the typing animation, append the paragraph element and save the chats to local storage
     incomingChatDiv.querySelector(".typing-animation").remove();
     incomingChatDiv.querySelector(".chat-details").appendChild(pElement);
 
@@ -128,7 +144,6 @@ const copyResponse = (copyBtn) => {
 
 
 const showTypingAnimation = () => {
-    // Display the typing animation and call the getChatResponse function
     const html = `
                 <div>
                     <svg xmlns="http://www.w3.org/2000/svg" height="1.5em" viewBox="0 0 640 512" class=user_icon><style>user_icon{fill:#ffffff}</style><path d="M320 0c17.7 0 32 14.3 32 32V96H472c39.8 0 72 32.2 72 72V440c0 39.8-32.2 72-72 72H168c-39.8 0-72-32.2-72-72V168c0-39.8 32.2-72 72-72H288V32c0-17.7 14.3-32 32-32zM208 384c-8.8 0-16 7.2-16 16s7.2 16 16 16h32c8.8 0 16-7.2 16-16s-7.2-16-16-16H208zm96 0c-8.8 0-16 7.2-16 16s7.2 16 16 16h32c8.8 0 16-7.2 16-16s-7.2-16-16-16H304zm96 0c-8.8 0-16 7.2-16 16s7.2 16 16 16h32c8.8 0 16-7.2 16-16s-7.2-16-16-16H400zM264 256a40 40 0 1 0 -80 0 40 40 0 1 0 80 0zm152 40a40 40 0 1 0 0-80 40 40 0 1 0 0 80zM48 224H64V416H48c-26.5 0-48-21.5-48-48V272c0-26.5 21.5-48 48-48zm544 0c26.5 0 48 21.5 48 48v96c0 26.5-21.5 48-48 48H576V224h16z"/></svg>
@@ -173,6 +188,7 @@ const stopResponse = () => {
         headers: requestOptions.headers,
         dataType: "json",
         success: function(response) {
+            hideStop();
             restartResponse();
         },
         error: function(xhr, status, error) {
@@ -184,39 +200,15 @@ const stopResponse = () => {
 }
 
 
-const hideResponse = () => 
-{
-    response_model_class.classList.add("hidden");
-}
 
-const hideRestart = () => {
-    document.getElementById("restart").classList.add("hidden");
-}
-
-
-
-const showResponse = () => {
-    const html = `
-        <div class="generate-response" id="stop">
-            <span onclick="stopResponse(this)">Stop Generation</span>
-        </div>
-    `;
-    if (response_model_class.classList.contains("hidden")){
-        response_model_class.classList.remove("hidden");
-    }
-    const responseModel = createChatElement(html,"responses");
-    response_model_class.appendChild(responseModel);
-}
 
 const restart_generation = async () => {
     const API_URL = "api/restart";
+    
     const chat_count = `.chat.incoming.chat-${localStorage.getItem("chat-count")}`;
     const incomingChatDiv = document.querySelector(chat_count);
-
     const chatDetailsDiv = incomingChatDiv.querySelector(".chat-details");
-   
     const existingParagraphs = chatDetailsDiv.querySelectorAll("p");
-    
     const pElement = document.createElement("p");
     
     existingParagraphs.forEach((paragraph) => {
@@ -260,14 +252,15 @@ const restart_generation = async () => {
         let result = "";
         const reader = readableStreamResponse.body.getReader();
         while (true) {
+            going.chat = true;
             const { done, value } = await reader.read();
             if (done) {
-                // When the response is completed, append the paragraph element and save the chats to local storage
                 pElement.textContent = result;
                 chatDetailsDiv.appendChild(pElement);
                 localStorage.setItem("all-chats", chatContainer.innerHTML);
                 chatContainer.scrollTo(0, chatContainer.scrollHeight);
                 hideAnimation();
+                going.chat=false;
                 break;
             }
             result += decoder.decode(value);
@@ -275,33 +268,62 @@ const restart_generation = async () => {
             incomingChatDiv.querySelector(".chat-details").appendChild(pElement);
         }
     } catch (error) {
-        // Add error class to the paragraph element and set error text
         pElement.classList.add("error");
         pElement.textContent = error;
         chatDetailsDiv.appendChild(pElement);
         localStorage.setItem("all-chats", chatContainer.innerHTML);
         chatContainer.scrollTo(0, chatContainer.scrollHeight);
     }
+    incomingChatDiv.querySelector(".typing-animation").remove();
 };
 
+const hideStop = () => {
+    response_model_class.classList.add("hidden");
+}
+
+const hideRestart = () => {
+    console.log("hideRestart")
+    restart_response_model.classList.add("hidden");
+}
+
+const hideAllResponse = () => {
+    hideStop();
+    hideRestart();
+}
+
+const showResponse = () => {
+    const html = `
+        <div class="generate-response" id="stop">
+            <span onclick="stopResponse()">Stop Generation</span>
+        </div>
+    `;
+    if (response_model_class.classList.contains("hidden")){
+        response_model_class.classList.remove("hidden");
+    }
+    const responseModel = createChatElement(html,"responses");
+    response_model_class.appendChild(responseModel);
+}
 
 const restartResponse = () =>{
     const html = `
-        <div class="generate-response" id="restart">
+        <div class="restart-response" id="restart">
             <span onclick="restart_generation()">Restart Response</span>
+            
         </div>  
     `;
-   
+    if (restart_response_model.classList.contains("hidden")){
+        restart_response_model.classList.remove("hidden");
+    }
     const responseModel = createChatElement(html,"restart-responses");
-    response_model_class.appendChild(responseModel);   
+    restart_response_model.appendChild(responseModel);   
 }
 
 
-const handleOutgoingChat = () => {
-    userText = chatInput.value.trim(); // Get chatInput value and remove extra spaces
-    if(!userText) return; // If chatInput is empty return from here
 
-    // Clear the input field and reset its height
+const handleOutgoingChat = () => {
+    userText = chatInput.value.trim();
+    if(!userText) return;
+
     chatInput.value = "";
     chatInput.style.height = `${initialInputHeight}px`;
 
@@ -312,7 +334,6 @@ const handleOutgoingChat = () => {
                     </div>
                 </div>`;
 
-    // Create an outgoing chat div with user's message and append it to chat container
     const outgoingChatDiv = createChatElement(html, "outgoing");
     chatContainer.querySelector(".default-text")?.remove();
     chatContainer.appendChild(outgoingChatDiv);
@@ -321,12 +342,11 @@ const handleOutgoingChat = () => {
 }
 
 deleteButton.addEventListener("click", () => {
-    // Remove the chats from local storage and call loadDataFromLocalstorage function
     if(confirm("Are you sure you want to delete all the chats?")) {
         localStorage.removeItem("all-chats");
         localStorage.removeItem("chat-count");
         loadDataFromLocalstorage();
-        hideResponse();
+        hideAllResponse();
         count=0;
     }
 });
@@ -335,7 +355,6 @@ deleteButton.addEventListener("click", () => {
 const initialInputHeight = chatInput.scrollHeight;
 
 chatInput.addEventListener("input", () => {   
-    // Adjust the height of the input field dynamically based on its content
     chatInput.style.height =  `${initialInputHeight}px`;
     chatInput.style.height = `${chatInput.scrollHeight}px`;
 });

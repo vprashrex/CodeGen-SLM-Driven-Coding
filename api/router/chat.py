@@ -42,8 +42,6 @@ from fastapi import status
 from api.custom_response import CustomJSONResponse
 from fastapi import HTTPException
 import threading
-from api.router import word_get
-
 
 stop = threading.Event()
 s = {}
@@ -51,15 +49,7 @@ s = {}
 async def generate_word(prompt: str):
     global stop
     try:
-
-        words = list(word_get.words.split( ))
-        for word in words:
-            await asyncio.sleep(0.01)
-            if s["stop"]:
-                break
-            yield f"{word} "
-
-        ''' async with load_model() as model:
+        async with load_model() as model:
             loop = asyncio.get_event_loop()
             future = loop.run_in_executor(None, model.infer, prompt)
             gen_word = await asyncio.wait_for(future, 120)
@@ -67,7 +57,7 @@ async def generate_word(prompt: str):
                 if s["stop"]:
                     break
                 await asyncio.sleep(0.01)
-                yield word '''
+                yield word
     except asyncio.TimeoutError:
         raise HTTPException(
             status_code=status.HTTP_408_REQUEST_TIMEOUT,
@@ -91,7 +81,7 @@ async def generate(chat_request: ChatRequest):
             status_code=200,
             media_type="text/plain"
         )
-
+        
         return response
 
     except HTTPException as e:

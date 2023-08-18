@@ -3,6 +3,11 @@ from dataclasses import dataclass, asdict
 from ctransformers import AutoModelForCausalLM, AutoConfig
 
 
+'''
+1. AutoTokenizer Implementation
+'''
+
+
 @dataclass
 class GenerationConfig:
     temperature: float
@@ -19,9 +24,9 @@ class GenerationConfig:
 
 def format_prompt(user_prompt: str):
     return f"""### Instruction:
-{user_prompt}
+            {user_prompt}
 
-### Response:"""
+            ### Response:"""
 
 
 def generate(
@@ -50,6 +55,8 @@ if __name__ == "__main__":
         config=config,
     )
 
+    tokenizer = Auto
+
     generation_config = GenerationConfig(
         temperature=0.2,
         top_k=50,
@@ -57,9 +64,9 @@ if __name__ == "__main__":
         repetition_penalty=1.0,
         max_new_tokens=512,  # adjust as needed
         seed=42,
-        reset=True,  # reset history (cache)
+        reset=False,  # reset history (cache)
         stream=True,  # streaming per word/token
-        threads=int(os.cpu_count() / 6),  # adjust for your CPU
+        threads=int(os.cpu_count()/6),  # adjust for your CPU
         stop=["<|endoftext|>"],
     )
 
@@ -67,9 +74,9 @@ if __name__ == "__main__":
     assistant_prefix = f"[assistant]:"
 
     while True:
-        user_prompt = input("")
+        user_prompt = input(f"{user_prefix}")
         generator = generate(llm, generation_config, user_prompt.strip())
-        print("", end=" ", flush=True)
+        print(f"{assistant_prefix}", end=" ", flush=True)
         for word in generator:
             print(word, end="", flush=True)
         print("")
