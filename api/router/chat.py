@@ -47,12 +47,15 @@ stop_flags = {}
 async def generate_word(prompt: str):
     global stop_flags
     try:
-        async with load_model() as model:
+        '''async with load_model() as model:
             loop = asyncio.get_event_loop()
             future = loop.run_in_executor(None,model.infer,prompt)
             gen_word = await asyncio.wait_for(future,120)
             for word in gen_word:
-                yield word
+                yield word'''
+        words=['bsdjdsvmm','gdffggh','gdfhftjnjyjk']
+        for word in words:
+            yield word
     
     except asyncio.TimeoutError:
         raise HTTPException(

@@ -31,7 +31,20 @@ const createChatElement = (content, className) => {
     return chatDiv; // Return the created chat div
 }
 
-  
+function generateRandomString(length) {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        result += characters.charAt(randomIndex);
+    }
+    return result;
+}
+
+// Generate a random string of length 10
+const randomString = generateRandomString(10); 
+sessionStorage.setItem("session_id",randomString)
+
 const getChatResponse = async (incomingChatDiv) => {
     const API_URL = "api/instruct_resp";
     const pElement = document.createElement("p"); // Create a new p element
@@ -92,7 +105,9 @@ const getChatResponse = async (incomingChatDiv) => {
                     },
                     body: JSON.stringify({
                         question: userText,
-                        answer: result
+                        answer: result,
+                        html: chatContainer.innerHTML,
+                        session_id: sessionStorage.getItem("session_id")
                     })
                 }
                 //console.log(question)
