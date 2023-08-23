@@ -4,6 +4,7 @@ const chatContainer = document.querySelector(".chat-container");
 const deleteButton = document.querySelector("#delete-btn");
 const response_model_class = document.querySelector(".response-model");
 const restart_response_model = document.querySelector(".restart-response-model");
+const chat_history = document.querySelector(".chat_history");
 
 let count = localStorage.getItem("chat-count") || 0;
 let userText = null;
@@ -113,6 +114,12 @@ const getChatResponse = async (incomingChatDiv) => {
                         html: chatContainer.innerHTML
                     })
                 }
+                var dict = new Map();
+
+                dict.set("session_id","abcdedgassa");
+                chat_history.dataMap = dict;
+
+                console.log(chat_history.dataMap.get("session_id")) // -->session_storage.setItem("key":"value_different")
             
                 await fetch("/conv",sendmsgoptions);
                 break;

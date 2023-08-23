@@ -5,7 +5,7 @@ services:
     image: codegen
     restart: always
     build:
-      context: .
+      context: ./
       dockerfile: Dockerfile
     ports:
       - "8000:8000"

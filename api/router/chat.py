@@ -49,7 +49,10 @@ s = {}
 async def generate_word(prompt: str):
     global stop
     try:
-        async with load_model() as model:
+        for word in ["word1","word2","word3\n"]:
+            yield word
+
+        ''' async with load_model() as model:
             loop = asyncio.get_event_loop()
             future = loop.run_in_executor(None, model.infer, prompt)
             gen_word = await asyncio.wait_for(future, 120)
@@ -57,7 +60,7 @@ async def generate_word(prompt: str):
                 if s["stop"]:
                     break
                 await asyncio.sleep(0.01)
-                yield word
+                yield word '''
     except asyncio.TimeoutError:
         raise HTTPException(
             status_code=status.HTTP_408_REQUEST_TIMEOUT,

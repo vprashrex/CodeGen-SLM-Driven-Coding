@@ -1,0 +1,16 @@
+ctransformers==0.2.11
+transformers==4.30.2
+uvicorn
+jinja2
+fastapi
+gunicorn
+cryptography==41.0.2
+bcrypt==4.0.1
+async-timeout==4.0.2
+fastapi-users==12.1.0
+langchain==0.0.181
+python-dotenv==1.0.0
+python-jose==3.3.0
+python-multipart==0.0.6
+PyJWT==2.7.0
+redis==4.6.0
