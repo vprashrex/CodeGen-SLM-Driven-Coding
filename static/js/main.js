@@ -31,7 +31,7 @@ const createChatElement = (content, className) => {
     return chatDiv; // Return the created chat div
 }
 
-function generateRandomString(length) {
+/*function generateRandomString(length) {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let result = '';
     for (let i = 0; i < length; i++) {
@@ -43,7 +43,7 @@ function generateRandomString(length) {
 
 // Generate a random string of length 10
 const randomString = generateRandomString(10); 
-sessionStorage.setItem("session_id",randomString)
+sessionStorage.setItem("session_id",randomString)*/
 
 const getChatResponse = async (incomingChatDiv) => {
     const API_URL = "api/instruct_resp";
@@ -107,7 +107,7 @@ const getChatResponse = async (incomingChatDiv) => {
                         question: userText,
                         answer: result,
                         html: chatContainer.innerHTML,
-                        session_id: sessionStorage.getItem("session_id")
+                        session: "2003"
                     })
                 }
                 //console.log(question)

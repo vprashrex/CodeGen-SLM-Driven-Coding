@@ -85,7 +85,7 @@ class Conv(BaseModel):
     question: str
     answer: str
     html: str
-    session_id: str
+    session: str
 
 async def gen_id():
     return uuid.uuid4()
@@ -96,7 +96,8 @@ qaList = []
 async def get_conv(conv: Conv):
     try:
         conv_id = await gen_id()
-        str_conv_id = str(conv_id)
+        session_key = conv.session
+        print(session_key)
         question = conv.question
         ans = conv.answer
         html = conv.html
@@ -112,20 +113,21 @@ async def get_conv(conv: Conv):
         print(qaList)
         #print(str_conv_id)
 
-        Conv_json = json.dumps({"qalist":qaList,"conv_id":str_conv_id,"conv_title":conv_title,"time":dtime})
-    
-        session_key = f"session:{str_conv_id}"
+        Conv_json = json.dumps({"qalist":qaList,"conv_id":session_key,"conv_title":conv_title,"time":dtime})
 
-        r.lpush(session_key, Conv_json)
-        r.set(session_key,html)
-        data = {"conv_id":str_conv_id, "conv_title":conv_title, "time":dtime, "exp":datetime.datetime.utcnow()+ datetime.timedelta(hours=1)}
+        #r.lpush(session_key,r.lpush(question,ans))
+        r.set(session_key,html)#update with this key(2003)
+        '''for i in r.lrange(session_key, 0,- 1):
+            print(i)'''
+        
+        data = {"conv_id":session_key, "conv_title":conv_title, "time":dtime, "exp":datetime.datetime.utcnow()+ datetime.timedelta(hours=1)}
         secret_key = "9d38ddb8d95d5e3b6efc132b8da4a30281024696a74e385806b168c9195b26de"
         token = jwt.encode(data, secret_key, algorithm="HS256")
         #print("JWT Token is: ",token)
-
+        #print("Session_id: ",session_key)
         htmlcode = r.get(session_key)
-        print("-------------HTML CODE BELOW-------------------------")
-        print(htmlcode.decode('utf-8'))
+        #print("-------------HTML CODE BELOW-------------------------")
+        #print(htmlcode.decode('utf-8'))
 
     except Exception as e:
         print(e)
