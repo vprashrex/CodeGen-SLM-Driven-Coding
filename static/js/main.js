@@ -103,6 +103,10 @@ const getChatResponse = async (incomingChatDiv) => {
             if (done){
                 going.chat = false;
                 hideAnimation();
+                /* dict.set("session_id","abcdedgassa");
+                chat_history.dataMap = dict; */
+                /* var dict = new Map();
+                console.log(chat_history.dataMap.get("session_id")) // -->session_storage.setItem("key":"value_different") */
                 const sendmsgoptions = {
                     method: "POST",
                     headers: {
@@ -111,20 +115,14 @@ const getChatResponse = async (incomingChatDiv) => {
                     body: JSON.stringify({
                         question: userText,
                         answer: result,
-                        html: chatContainer.innerHTML
+                        html: chatContainer.innerHTML,
                     })
                 }
-                var dict = new Map();
+    
+                //const response = await (await fetch("/conv",sendmsgoptions)).json();
+                //chatContainer.innerHTML = response.html_code.trim();
 
-                dict.set("session_id","abcdedgassa");
-                chat_history.dataMap = dict;
-
-                console.log(chat_history.dataMap.get("session_id")) // -->session_storage.setItem("key":"value_different")
-            
-                await fetch("/conv",sendmsgoptions);
                 break;
-
-                
             }
             result += decoder.decode(value);
             pElement.textContent = result;  

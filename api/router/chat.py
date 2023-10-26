@@ -19,8 +19,6 @@ router = APIRouter()
 model = model_api.CodeGen()
 
 
-
-
 async def stram_buffer(word:str):
     buffer = io.StringIO()
     sys.stdout = buffer
@@ -49,10 +47,7 @@ s = {}
 async def generate_word(prompt: str):
     global stop
     try:
-        for word in ["word1","word2","word3\n"]:
-            yield word
-
-        ''' async with load_model() as model:
+        async with load_model() as model:
             loop = asyncio.get_event_loop()
             future = loop.run_in_executor(None, model.infer, prompt)
             gen_word = await asyncio.wait_for(future, 120)
@@ -60,7 +55,7 @@ async def generate_word(prompt: str):
                 if s["stop"]:
                     break
                 await asyncio.sleep(0.01)
-                yield word '''
+                yield word
     except asyncio.TimeoutError:
         raise HTTPException(
             status_code=status.HTTP_408_REQUEST_TIMEOUT,
@@ -76,17 +71,13 @@ async def generate_word(prompt: str):
 async def generate(chat_request: ChatRequest):
     try:
         user_prompt = chat_request.prompt
-        #stop.clear()
         s["stop"] = False
-
         response = StreamingResponse(
             generate_word(user_prompt),
             status_code=200,
             media_type="text/plain"
         )
-        
         return response
-
     except HTTPException as e:
         return CustomJSONResponse(
             content={"error": e.detail},
@@ -99,20 +90,16 @@ async def generate(chat_request: ChatRequest):
             content={"error": str(e)}
         )
 
-
 @router.post("/api/restart")
 async def restart_generation(chat_request: ChatRequest):
     try:
         user_prompt = chat_request.prompt
-        #stop.clear()
         s["stop"] = False
-
         response = StreamingResponse(
             generate_word(user_prompt),
             status_code=200,
             media_type="text/plain"
         )
-
         return response
 
     except HTTPException as e:
