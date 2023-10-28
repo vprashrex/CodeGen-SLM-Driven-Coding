@@ -8,7 +8,6 @@ origins = [
     "*"
 ]
 
-
 def init_app():
     '''
     initliaze db here
@@ -32,7 +31,6 @@ def init_app():
     @app.get("/",response_class=HTMLResponse)
     async def index(request:Request):
         return templates.TemplateResponse("index.html",context={"request":request})
-
 
     from api.router import chat,conv
 
