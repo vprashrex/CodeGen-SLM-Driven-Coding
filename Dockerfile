@@ -42,4 +42,8 @@ RUN apt-get remove -y --purge make gcc build-essential \
 
 WORKDIR /app
 
-CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000", "--workers", "5", "--worker-connections", "1000","--timeout", "10000", "server:app"]
+ENV CPU_THREADS=$(nproc)
+
+ENV WORKERS=$((CPU_THREADS*2+1))
+
+CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000", "--workers","9", "--worker-connections", "1000","--timeout", "10000", "server:app"]
