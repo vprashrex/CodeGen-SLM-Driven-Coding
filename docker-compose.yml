@@ -5,7 +5,7 @@ services:
     image: prashrex/codegen
     restart: always
     build:
-      context: ./api
+      context: .
       dockerfile: Dockerfile
     ports:
       - "8000:8000" 

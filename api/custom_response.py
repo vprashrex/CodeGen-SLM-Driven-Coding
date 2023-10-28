@@ -3,12 +3,8 @@ import typing
 from typing import Optional,Any,Generic,TypeVar,Dict
 from fastapi import Response
 from fastapi.encoders import jsonable_encoder
-from fastapi.exceptions import ResponseValidationError
-from fastapi_users.router import ErrorCode
-from pydantic import ValidationError
 from pydantic.generics import GenericModel
 from starlette.background import BackgroundTask
-from revChatGPT.typings import Error as revChatGPTError
 
 
 T = TypeVar('T')

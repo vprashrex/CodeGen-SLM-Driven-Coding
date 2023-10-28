@@ -1,4 +1,0 @@
-uvicorn
-jinja2
-fastapi
-gunicorn

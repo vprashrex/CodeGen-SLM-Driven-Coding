@@ -14,7 +14,7 @@ class GenerationConfig:
     reset: bool
     stream: bool
     threads: int
-    stop: list[str]
+    stop: list
 
 class ModelsPath:
     CODE_GEN_MODEL = "./models/replit-v2-codeinstruct-3b.q4_1.bin"
