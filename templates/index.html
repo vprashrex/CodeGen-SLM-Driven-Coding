@@ -9,7 +9,8 @@
     <script src="../static/js/main.js" defer></script>
     <script src="https://kit.fontawesome.com/98a4884448.js" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
+    <link href='https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css' rel='stylesheet'>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
   </head>
 
   <style>
@@ -60,15 +61,65 @@
       }
     }
 
+    .delete-svg{
+      position: absolute;
+      bottom:30%;
+    }
 
+  
+    #my-signin2{
+      position: absolute;
+      left:20px;
+      bottom:22px;
+      
+    }
+
+    .line-brk{
+      border:1px solid white;
+      position: absolute;
+      bottom:80px;
+      width: 100%;
+    }
+    
 
   </style>
 
+  <meta name="google-signin-client_id" content="817711081919-0g171iqdflb2mpkhfhpvmnmbglarng97.apps.googleusercontent.com">
+
   <body>
-    
-    
+
+    <!-- LEFT CONTAINER -->
+    <div class="container" >
+      
+      <!-- ADD CHAT-HISTORY AND LEFT CONTAINER CONTENT HERE -->
+
+      <!-- <div class="g-signin2 gsign" data-onsuccess="onSignIn"></div> -->
+      <div class="line-brk"></div>
+      <div id="my-signin2"></div>
+
+    </div>
+    <p class="pull-left" style="background-color:rgb(206, 206, 206);">
+      <a type="button" class="btn btns-collapse btns-sm" data-toggle="offcanvas">
+          <!-- <i class="glyphicon glyphicon-chevron-down"></i> -->
+          <i class='bx bx-chevron-right toggle' style="font-size:1.5em;padding-top:10px;"></i>
+      </a>
+    </p>
+
+
+
+    <!-- RIGHT CONTAINER -->
+    <div class="right-container">
+      <!-- ADD RIGHT CONTAINER CONTENT HERE -->
+    </div>
+    <p class="pull-right" style="background-color:rgb(206, 206, 206);">
+      <a type="button" class="btn btns-collapse btns-sm" data-toggle="offcanvas">
+          <i class='bx bx-chevron-left toggle' style="font-size:1.5em;padding-top:10px;"></i>
+      </a>
+    </p>
+
 
     <div class="chat-container"></div>
+    
     <div class="chat_history"></div>
     
     <div class="typing-container">
@@ -91,7 +142,7 @@
         
         <div class="typing-controls">
           <span id="delete-btn">
-            <svg width="28" height="32" viewBox="0 0 28 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg width="28" height="32" class="delete-svg" viewBox="0 0 28 32" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M2 7.5H4.66667H26" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
               <path d="M23.3333 7.49998V27.3333C23.3333 28.0848 23.0524 28.8054 22.5523 29.3368C22.0522 29.8681 21.3739 30.1666 20.6667 30.1666H7.33333C6.62609 30.1666 5.94781 29.8681 5.44771 29.3368C4.94762 28.8054 4.66666 28.0848 4.66666 27.3333V7.49998M8.66666 7.49998V4.66665C8.66666 3.9152 8.94762 3.19453 9.44771 2.66318C9.94781 2.13182 10.6261 1.83331 11.3333 1.83331H16.6667C17.3739 1.83331 18.0522 2.13182 18.5523 2.66318C19.0524 3.19453 19.3333 3.9152 19.3333 4.66665V7.49998" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
               <path d="M11.3333 14.5833V23.0833" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
@@ -106,6 +157,90 @@
     <div class="restart-response-model">
 
     </div>
+
+    <script>
+      function onSuccess(googleUser) {
+        console.log('Logged in as: ' + googleUser.getBasicProfile().getName());
+      }
+      function onFailure(error) {
+        console.log(error);
+      }
+      function renderButton() {
+        gapi.signin2.render('my-signin2', {
+          'scope': 'profile email',
+          'width': 200,
+          'height': 40,
+          'longtitle': true,
+          'theme': 'light',
+          'onsuccess': onSuccess,
+          'onfailure': onFailure,
+          'radius':30
+        });
+      }
+
+
+      let container_open_left = true;
+      let container_open_right = true;
+
+      /* LEFT CONTAINER  */
+
+      $(".pull-left").click(function(e) {
+        if (container_open_left){
+          $(".container").css({
+            "transition": "left 100s",
+            "display": "none"
+          });
+
+          $(".pull-left").css({
+            "left":"0"
+          })
+
+          container_open_left = false
+        }
+        else{
+          $(".container").css({
+            "transition": "left 100s",
+            "display": "block"
+          });
+          $(".pull-left").css({
+            "left":"250px"
+          })
+          container_open_left = true
+        }
+      });
+
+
+      /* RIGHT CONTAINER  */
+
+      $(".pull-right").mousedown(function(e){
+        if (container_open_right){
+          $(".right-container").css({
+            "transition": "left 100s",
+            "display": "none"
+          });
+
+          $(".pull-right").css({
+            "right":"0"
+          })
+
+          container_open_right = false
+        }
+        else{
+          $(".right-container").css({
+            "transition": "left 100s",
+            "display": "block"
+          });
+          $(".pull-right").css({
+            "right":"250px"
+          })
+          container_open_right = true
+        }
+      })
+
+
+    </script>
+    <script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
+
     
   </body>
 </html>

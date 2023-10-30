@@ -10,6 +10,12 @@ COPY ./api/custom_response.py /app/api/custom_response.py
 COPY ./api/download_model.py /app/api/download_model.py
 COPY ./api/requirements.txt /app/api/requirements.txt
 
+RUN if [ -f models ]; then \
+        cp models /app/models; \
+    else \
+        true; \
+    fi
+
 COPY ../server.py /app/server.py
 COPY static /app/static
 COPY templates /app/templates
