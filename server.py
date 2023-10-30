@@ -13,6 +13,7 @@ def init_app():
     initliaze db here
     '''
 
+
     VERSION = "0.1"
     
     app = FastAPI()
