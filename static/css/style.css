@@ -15,6 +15,7 @@
   --incoming-chat-bg: #444654;
   --outgoing-chat-border: #343541;
   --incoming-chat-border: #343541;
+  --left-parameter: 25%;
 }
 .light-mode {
   --text-color: #343541;
@@ -66,7 +67,8 @@ body {
   font-size: 1.1rem;
 }
 .chat-container .chat {
-  padding: 25px 10px;
+  padding: 15px 15px;
+
   display: flex;
   justify-content: center;
   color: var(--text-color);
@@ -78,14 +80,16 @@ body {
 .chat-container .chat.incoming {
   background: var(--incoming-chat-bg);
   border: 1px solid var(--incoming-chat-border);
+
 }
 .chat .chat-content {
   display: flex;
-  max-width: 1200px;
-  width: 100%;
+  max-width: 1000px;
+  width: 60%;
   align-items: flex-start;
   justify-content: space-between;
 }
+
 
 .generate-response {
   --tw-border-opacity: 1;
@@ -201,17 +205,21 @@ span.material-symbols-rounded {
 
 }
 
+@media screen and (max-width: 768px) {
+  :root {
+      --left-parameter: 10%;
+  }
+}
 
 /* Typing container styling */
 .typing-container {
   position: fixed;
   bottom: 0;
-  width: 100%;
+  left:var(--left-parameter);
+  width: 50%;
   display: flex;
-  padding: 20px 10px;
+  padding: 10px 10px;
   justify-content: center;
-  background: var(--outgoing-chat-bg);
-  border-top: 1px solid var(--incoming-chat-border);
 }
 .typing-container .typing-content {
   display: flex;
@@ -237,7 +245,10 @@ span.material-symbols-rounded {
   overflow-y: auto;
   background: #40414f;
   outline: none;
+  box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.8); /* Adjust the values to achieve the desired shadow effect */
 }
+
+
 .typing-textarea textarea::placeholder {
   color: var(--placeholder-color);
 }
@@ -309,3 +320,53 @@ span.material-symbols-rounded {
   }
   
 }
+
+.container{
+  width: 250px;
+  height: 100%;
+  background-color: black;
+  position: fixed;
+  display: block;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.pull-left{
+  position:fixed;
+  left:250px;
+  top:45%;
+  width:20px;
+  height:45px;
+  border-radius:0px 10px 10px 0px;
+  cursor:pointer;
+  
+}
+
+.pull-right{
+  position:fixed;
+  right:250px;
+  top:45%;
+  width:20px;
+  height:45px;
+  border-radius:10px 0px 0px 10px;
+  cursor:pointer;
+  
+}
+
+.right-container{
+  width: 250px;
+  height: 100%;
+  background-color: black;
+  position: fixed;
+  display: block;
+  flex-direction: column;
+  box-sizing: border-box;
+  right:0%;
+}
+
+
+
+.generate-response{
+  left:40%;
+}
+

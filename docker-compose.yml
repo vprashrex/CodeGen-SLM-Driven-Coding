@@ -1,5 +1,4 @@
 version: '3.8'
-
 services:
   CodeGen:
     image: prashrex/codegen
@@ -11,3 +10,21 @@ services:
       - "8000:8000" 
     tty: true
     stdin_open: true
+
+  watchtower:
+    image: containrrr/watchtower
+    command: --interval 30 
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - WATCHTOWER_CLEANUP=true
+
+  redis:
+    image: redis:3.0
+    restart: always
+    ports:
+      - "6379:6379"
+
+networks:
+  express_nw:
+    driver: bridge

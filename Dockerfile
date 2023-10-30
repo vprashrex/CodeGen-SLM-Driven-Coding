@@ -10,8 +10,13 @@ COPY ./api/custom_response.py /app/api/custom_response.py
 COPY ./api/download_model.py /app/api/download_model.py
 COPY ./api/requirements.txt /app/api/requirements.txt
 
+RUN if [ -f models ]; then \
+        cp models /app/models; \
+    else \
+        true; \
+    fi
+
 COPY ../server.py /app/server.py
-COPY models /app/models
 COPY static /app/static
 COPY templates /app/templates
 COPY ../entrypoint.sh /app/entrypoint.sh
@@ -26,6 +31,7 @@ RUN apt-get update && \
     wget
 
 WORKDIR /app
+
 
 RUN python3 -m pip install --upgrade pip
 RUN python3 -m pip install --no-cache-dir -r /app/api/requirements.txt
