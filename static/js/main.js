@@ -22,7 +22,7 @@ const showAnimation = () =>{
     document.getElementById("send-btn").style.visibility = "hidden";
 }
 
-//hideAnimation();
+hideAnimation();
 
 
 
