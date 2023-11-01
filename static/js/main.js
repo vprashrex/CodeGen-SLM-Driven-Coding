@@ -29,7 +29,7 @@ hideAnimation();
 const loadDataFromLocalstorage = () => {
  
     const defaultText = `<div class="default-text">
-                            <h1>CodeGen: LLM Coding</h1>
+                            <h1>CodeGen: Coding</h1>
                             <p>This is a code instruct Model.</p>
                             <p>If you have any query regarding the code,<br>just type the query and you will get the answer</p>
                         </div>`
