@@ -93,7 +93,7 @@ async def gen_id():
 # redis hset
 qaList = []
 @router.post("/conv")
-async def get_conv(conv: Conv):
+async def getconv(conv: Conv):
     try:
         conv_id = await gen_id()
         str_conv_id = str(conv_id)
@@ -125,7 +125,7 @@ async def get_conv(conv: Conv):
 
         htmlcode = r.get(session_key)
         print("-------------HTML CODE BELOW-------------------------")
-        html_code = htmlcode.decode("utf-8")
+        #html_code = htmlcode.decode("utf-8")
 
        
         ''' return JSONResponse(
