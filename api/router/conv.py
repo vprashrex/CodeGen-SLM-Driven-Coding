@@ -123,7 +123,7 @@ async def get_conv(conv: Conv):
         data = {"conv_id":session_key, "conv_title":conv_title, "time":dtime, "exp":datetime.datetime.utcnow()+ datetime.timedelta(hours=1)}
         secret_key = "9d38ddb8d95d5e3b6efc132b8da4a30281024696a74e385806b168c9195b26de"
         token = jwt.encode(data, secret_key, algorithm="HS256")
-        #print("JWT Token is: ",token)
+        print("JWT Token is: ",token)
         #print("Session_id: ",session_key)
         htmlcode = r.get(session_key)
         #print("-------------HTML CODE BELOW-------------------------")
