@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="static/css/style.css">
+    <script src="static/js/send_chat.js" defer></script>
+
+    <style>
+        .chat-container{
+            position:absolute;
+            top:15%;
+            left:50%;
+            transform: translate(-50%,-50%);
+        }
+    </style>
+    
+</head>
+<body>
+    <button id="create_div">Create div</button>
+    <div class="chat-container"></div>
+
+    <div id="container">
+    </div>
+
+    <div class="chat-container"></div>
+
+    <div class="typing-container">
+        <div class="typing-content">
+          <div class="typing-textarea">
+            <textarea id="chat-input" spellcheck="false" placeholder="Enter a prompt here" required style="overflow:hidden"></textarea>
+  
+            <span id="send-btn">
+              <svg width="22" height="20" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0.715001 1.45379C0.714918 1.23796 0.778763 1.0258 0.900319 0.837946C1.02188 0.650097 1.19701 0.492956 1.40866 0.381825C1.62031 0.270693 1.86127 0.209356 2.10809 0.203786C2.35491 0.198216 2.59917 0.248601 2.8171 0.350036L21.2184 8.89627C21.4474 9.00277 21.6392 9.16177 21.7729 9.35619C21.9065 9.5506 21.9771 9.77319 21.9771 10C21.9771 10.2269 21.9065 10.4494 21.7729 10.6439C21.6392 10.8384 21.4474 10.9973 21.2184 11.1038L2.81567 19.65C2.59768 19.7512 2.35344 19.8014 2.10671 19.7956C1.85998 19.7899 1.61916 19.7283 1.40767 19.6171C1.19619 19.5059 1.02126 19.3486 0.89987 19.1608C0.778493 18.9729 0.714803 18.7608 0.715001 18.545V12.9125C0.714976 12.6209 0.831606 12.3384 1.0447 12.114C1.2578 11.8897 1.55395 11.7374 1.88188 11.6838L12.155 10L1.88188 8.31629C1.55395 8.26263 1.2578 8.11042 1.0447 7.88603C0.831606 7.66164 0.714976 7.37917 0.715001 7.08754V1.45379Z" fill="white"/>
+                </svg>
+            </span>
+          </div>
+        </div>
+      </div>
+
+    <script>
+        var create_div = document.getElementById("create_div");
+        var container = document.getElementById("container");
+        var chatInput = document.getElementById("chat-input");
+        var id_count = 1;
+        const chatContainer = document.querySelector(".chat-container");
+
+
+        function generateRandomString(length) {
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                const randomIndex = Math.floor(Math.random() * characters.length);
+                result += characters.charAt(randomIndex);
+            }
+            return result;
+        }
+        const createChatElement = (content, className) => {
+            const chatDiv = document.createElement("div");
+            chatDiv.classList.add("chat", className);
+            chatDiv.innerHTML = content;
+            return chatDiv;
+        }
+
+
+        const handleOutgoingChat = () => {
+            userText = chatInput.value.trim();
+            if (!userText) return;
+            chatInput.value = "";
+
+            const html = `<div class="chat-content">
+                            <div class="chat-details">
+                                <p>${userText}</p>
+                            </div>
+                        </div>`;
+
+            const outgoingChatDiv = createChatElement(html, "outgoing");
+            chatContainer.querySelector(".default-text")?.remove();
+            chatContainer.appendChild(outgoingChatDiv);
+            chatContainer.scrollTo(0, chatContainer.scrollHeight);
+            
+        }
+
+        function createNewDiv(title) {
+            var sessionId = generateRandomString(5);
+            sessionStorage.setItem(sessionId, sessionId);
+            sessionStorage.setItem("present_session",sessionId);
+            var new_div = document.createElement("div");
+            new_div.id = "history-" + sessionId;
+            var dict = new Map();
+            dict.set("session_id", sessionId);
+            new_div.dataMap = dict;
+            new_div.style.border = "1px solid black";
+            new_div.style.width = "10%";
+            new_div.style.height = "20%";
+            new_div.style.padding = "20px";
+            new_div.style.margin = "10px";
+
+            var deleteIcon = document.createElement("span");
+            deleteIcon.innerText = "❌";
+            deleteIcon.style.cursor = "pointer";
+            deleteIcon.style.marginLeft = "10px";
+
+            deleteIcon.addEventListener("click", function (event) {
+                event.stopPropagation();
+                deleteDiv(new_div);
+                chatContainer.innerHTML = "";
+                sessionStorage.removeItem("present_session");
+
+            });
+
+            new_div.appendChild(deleteIcon);
+            var titleDiv = document.createElement("div");
+            titleDiv.innerText = title;
+            titleDiv.style.fontWeight = "bold";
+            titleDiv.id = "title "+sessionStorage.getItem("present_session");
+
+            new_div.appendChild(titleDiv);
+            container.appendChild(new_div);
+
+            new_div.addEventListener("click", function () {
+                var history = document.getElementById(new_div.id);
+                console.log(history.dataMap.get("session_id"));
+                sessionStorage.setItem("session", history.dataMap.get("session_id"));
+                console.log(chatContainer.innerHTML);
+
+                // onclicking sending the session_id to the fastapi
+
+                const requestOptions = {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(
+                        {
+                            session_id: history.dataMap.get("session_id")
+                        }
+                    )
+                }
+                const API_URL = "/session"
+                fetch(API_URL,requestOptions);
+
+            });
+
+            id_count++;
+        }
+
+        function deleteDiv(div) {
+            var sessionId = div.dataMap.get("session_id");
+            sessionStorage.removeItem(sessionId);
+            div.remove();
+            if (container.querySelectorAll("div").length === 0) {
+                sessionStorage.removeItem("start");
+            }
+        }
+
+        create_div.addEventListener("click", function () {
+            sessionStorage.removeItem("present_session");
+            var inputText = chatInput.value.trim();
+            if (inputText.length > 0) {
+                var inputWords = inputText.split(" ");
+                var title = inputWords.slice(0, 3).join(" ");
+                createNewDiv(title);
+                chatInput.value = "";
+                sessionStorage.setItem("start", true);
+            }
+            else {
+                createNewDiv("New Chat");
+                sessionStorage.setItem("start", true);
+            }
+            chatContainer.innerHTML = "";
+        });
+        
+        
+
+        if (container.querySelectorAll("div").length === 0) {
+            sessionStorage.removeItem("start");
+        }
+
+
+        function sendChat() {
+            var inputText = chatInput.value.trim();
+
+            if (inputText.length > 0) {
+                var inputWords = inputText.split(" ");
+                var title = inputWords.slice(0, 3).join(" ");
+                if (!sessionStorage.getItem("start")) {
+                    createNewDiv(title);
+                }
+                chatInput.value = inputText;
+                handleOutgoingChat();
+                sessionStorage.setItem("start", true);
+            }
+        }
+
+        
+
+        create_div.addEventListener("click", sendChat);
+
+        
+    </script>
+</body>
+</html>
