@@ -5,6 +5,7 @@ from fastapi.requests import Request
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import redis
+import jwt
 
 
 templates = Jinja2Templates(directory='templates')
@@ -13,7 +14,7 @@ app = FastAPI()
 
 app.mount("/static",StaticFiles(directory="static"))
 
-#r = redis.StrictRedis(host="localhost",port=6379,db=0)
+r = redis.StrictRedis(host="localhost",port=6379,db=0)
 
 @app.get("/")
 async def get(request:Request):
@@ -42,14 +43,29 @@ class ChatRequest(BaseModel):
 @app.post("/chat")
 async def chat(chat_request:ChatRequest):
     try:
-        print("session_id : {}".format(chat_request.session_id))
-        print("user Input : {}".format(chat_request.userText))
-        print("title: {}".format(chat_request.title))
-        print("\n")
-        print("html : \n{}".format(chat_request.html))
-        print("\n")
-        print("DateTime : {}".format(chat_request.timestamp))
+        session_id = chat_request.session_id
+        userText = chat_request.userText
+        html = chat_request.html
+        title = chat_request.title
+        timestamp = chat_request.timestamp
 
+        r.hmset(session_id, {"userText": userText, "title": title, "time": timestamp, "html": html})
+        print("Current session_id is: ",session_id)
+
+    except Exception as e:
+        print(e)
+        return JSONResponse(content={"error":str(e)})
+    
+@app.get("/htcode/{session_id}")
+async def chat(session_id):
+    try:
+        print("session_id", session_id)
+        htmlcode = r.hget(session_id, "html")
+        htcode = htmlcode.decode('utf-8')
+        print(htcode)
+        print(type(htcode))
+        return{"msg":"OK"}
+    
     except Exception as e:
         print(e)
         return JSONResponse(content={"error":str(e)})

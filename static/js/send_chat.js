@@ -1,6 +1,11 @@
 // sending the userInput chat
+const redis = require('redis');
 
-
+const r = redis.createClient({
+    host: 'localhost', // Your Redis server host
+    port: 6379,        // Your Redis server port
+    // Other options like password can be added if needed
+  });
 
 function formatTimestamp(date) {
     const year = date.getFullYear();
@@ -57,4 +62,13 @@ sendButton.addEventListener("click", function () {
     fetch("/chat",requestOptions);
     
 });
+
+r.hget(session_id, "html", (err, value) => {
+    if (err) {
+      console.error('Error getting field from Redis hash: ' + err);
+    } else {
+      console.log('Value from Redis hash: ' + value);
+    }
+  });
+
 sendButton.addEventListener("click", sendChat);
