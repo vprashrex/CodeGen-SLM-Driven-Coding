@@ -77,6 +77,81 @@
       margin-top:10px;
     }
 
+    .new-chat{
+      border: 1px solid #ffffff33;
+      padding-top: 10px;
+      padding-left: 10px;
+      padding-bottom: 6px;
+      margin-top:12px;
+      margin-left:8px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      width: 70%;
+      height:6%;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+      display:flex;
+     
+    }
+
+
+    .add-icon{
+      margin-right: 10px;
+      margin-top:3px;
+    }
+    .new-chat {
+      -webkit-user-select: none; /* Safari */
+      -moz-user-select: none; /* Firefox */
+      -ms-user-select: none; /* IE10+/Edge */
+      user-select: none; /* Standard syntax */
+    }
+
+    .chat-hist-div{
+      display: inline-flex;
+      padding:8px;
+      color: white;
+      width: 100%;
+      height:40px;
+      margin-top:10px;
+      margin-bottom:8px;
+      font-size:15px;
+    }
+
+    #chat-history{
+      overflow-y: scroll;
+      box-sizing: border-box;
+      height:79%;
+      padding-bottom:10px; 
+    }
+
+    #chat-history::-webkit-scrollbar-track
+    {
+      border-radius: 10px;
+      background-color: transparent;
+    }
+
+    #chat-history::-webkit-scrollbar
+    {
+      width: 7px;
+    }
+
+    #chat-history::-webkit-scrollbar-thumb
+    {
+      border-radius: 10px;
+      -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+      background-color: #ffffff;
+    }
+
+    span.del-icon{
+      position:relative;
+      left:180px;
+      top:6px;
+      font-size:13px;
+      padding-top:1px;
+    }
+
+
   </style>
 
 
@@ -86,6 +161,17 @@
     <div class="container" >
       
       <!-- ADD CHAT-HISTORY AND LEFT CONTAINER CONTENT HERE -->
+      <div class="new-chat" id="create_div">
+        <svg class="add-icon" width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8.00012 1.73282V15.2532" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M15.0001 8.15491L1.00004 8.0887" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <p>New Chat</p>
+      </div>
+
+
+      <div id="chat-history">
+      </div>
 
       <div class="line-brk"></div>
 
@@ -113,7 +199,10 @@
 
 
 
-    <!-- RIGHT CONTAINER -->
+
+
+
+    <!--------------- RIGHT CONTAINER ------------------->
     <div class="right-container">
       <!-- ADD RIGHT CONTAINER CONTENT HERE -->
     </div>
@@ -124,6 +213,7 @@
     </p>
 
 
+    <!------------------------- MAIN -------------------------------------------->
     <div class="chat-container"></div>
     
     <div class="chat_history"></div>
@@ -244,7 +334,12 @@
             setDivPosition();
             window.addEventListener('scroll', setDivPosition);
             window.addEventListener('resize', setDivPosition);
-        }
+      }
+      
+
+
+     
+
 
       //window.onload = stickToPosition;
 

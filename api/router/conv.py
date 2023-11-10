@@ -83,19 +83,37 @@ r = redis.StrictRedis(host='localhost', port=6379, db=0)
 router = APIRouter()
 
 class Conv(BaseModel):
-    question: str
-    answer: str
+    session_id: str
+    userText: str
     html: str
+    timestamp: str
+
 
 async def gen_id():
     return uuid.uuid4()
 
 # redis hset
 qaList = []
+
+class ChatHtml(BaseModel):
+    session_id: str
+
+@router.post("/session")
+async def session(chat_request:ChatHtml):
+    try:
+        print("current session : {}".format(chat_request.session_id))
+    except Exception as e:
+        print(e)
+        return JSONResponse(content={"error":str(e)})
+
+
 @router.post("/conv")
 async def get_conv(conv: Conv):
     try:
-        conv_id = await gen_id()
+
+        print(conv)
+
+        ''' conv_id = await gen_id()
         str_conv_id = str(conv_id)
         question = conv.question
         ans = conv.answer
@@ -125,7 +143,7 @@ async def get_conv(conv: Conv):
 
         htmlcode = r.get(session_key)
         print("-------------HTML CODE BELOW-------------------------")
-        html_code = htmlcode.decode("utf-8")
+        html_code = htmlcode.decode("utf-8") '''
 
        
         ''' return JSONResponse(
