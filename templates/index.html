@@ -11,6 +11,10 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link href='https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css' rel='stylesheet'>
     <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <meta name="google-signin-client_id" content="88959061574-buf7orgd6m6uphc01ks0is2koij3r9el.apps.googleusercontent.com">
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script src="https://accounts.google.com/gsi/client" async></script>
+
   </head>
 
   <style>
@@ -26,39 +30,23 @@
       color:#f1f2f788
     }
 
-    #key-animation {
-      display: flex;
-      position: fixed;
-      right: 21%;
-      bottom: 6%;
+    .typing-animations .typing-dot {
+      height: 5px;
+      width: 5px;
+      border-radius: 30%;
+      margin: 0 2px;
+      opacity: 0.7;
+      background: var(--text-color);
+      animation: animateDots 1.5s var(--delay) ease-in-out infinite;
     }
 
-    @media screen and (max-width: 768px) {
-      #key-animation {
-        right: 10%;
-        bottom: 4%;
-      }
-    }
-
-    @media screen and (min-width: 0px) and (max-width: 500px) {
-      #key-animation {
-        right:18%;
-        bottom:5%;
-      }
-    }
-    @media screen and (min-width: 501px) and (max-width: 900px) {
-      #key-animation {
-        right:12%;
-        bottom:6%;
-      }
-    }
-    
-
-    @media screen and (min-width: 1025px) {
-      #key-animation {
-        right: 21%;
-        bottom: 6%;
-      }
+    .typing-content #key-animation{
+      display: inherit;
+      position: absolute;
+      align-items: center;
+      right: 0;
+      bottom:50%;
+      padding-right:20px;
     }
 
     .delete-svg{
@@ -67,7 +55,7 @@
     }
 
   
-    #my-signin2{
+    .g_id_signin{
       position: absolute;
       left:20px;
       bottom:22px;
@@ -75,16 +63,97 @@
     }
 
     .line-brk{
-      border:1px solid white;
+      border:1px solid #ffffff33;
       position: absolute;
       bottom:80px;
       width: 100%;
     }
     
+    .toggle {
+      transition: transform 0.3s ease;
+    }
+    .clicked {
+      transform: rotate(180deg);
+      margin-top:10px;
+    }
+
+    .new-chat{
+      border: 1px solid #ffffff33;
+      padding-top: 10px;
+      padding-left: 10px;
+      padding-bottom: 6px;
+      margin-top:12px;
+      margin-left:8px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      width: 70%;
+      height:6%;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+      display:flex;
+     
+    }
+
+
+    .add-icon{
+      margin-right: 10px;
+      margin-top:3px;
+    }
+    .new-chat {
+      -webkit-user-select: none; /* Safari */
+      -moz-user-select: none; /* Firefox */
+      -ms-user-select: none; /* IE10+/Edge */
+      user-select: none; /* Standard syntax */
+    }
+
+    .chat-hist-div{
+      display: inline-flex;
+      padding:8px;
+      color: white;
+      width: 100%;
+      height:40px;
+      margin-top:10px;
+      margin-bottom:8px;
+      font-size:15px;
+    }
+
+    #chat-history{
+      overflow-y: scroll;
+      box-sizing: border-box;
+      height:79%;
+      padding-bottom:10px; 
+    }
+
+    #chat-history::-webkit-scrollbar-track
+    {
+      border-radius: 10px;
+      background-color: transparent;
+    }
+
+    #chat-history::-webkit-scrollbar
+    {
+      width: 7px;
+    }
+
+    #chat-history::-webkit-scrollbar-thumb
+    {
+      border-radius: 10px;
+      -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+      background-color: #ffffff;
+    }
+
+    span.del-icon{
+      position:relative;
+      left:180px;
+      top:6px;
+      font-size:13px;
+      padding-top:1px;
+    }
+
 
   </style>
 
-  <meta name="google-signin-client_id" content="817711081919-0g171iqdflb2mpkhfhpvmnmbglarng97.apps.googleusercontent.com">
 
   <body>
 
@@ -92,32 +161,59 @@
     <div class="container" >
       
       <!-- ADD CHAT-HISTORY AND LEFT CONTAINER CONTENT HERE -->
+      <div class="new-chat" id="create_div">
+        <svg class="add-icon" width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8.00012 1.73282V15.2532" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M15.0001 8.15491L1.00004 8.0887" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <p>New Chat</p>
+      </div>
 
-      <!-- <div class="g-signin2 gsign" data-onsuccess="onSignIn"></div> -->
+
+      <div id="chat-history">
+      </div>
+
       <div class="line-brk"></div>
-      <div id="my-signin2"></div>
+
+      <div id="g_id_onload"
+        data-client_id="395947950953-8ae3fbj4a88ej2v0m4h7g4aqoc7vdbof.apps.googleusercontent.com"
+        data-login_uri="http://localhost:8000"
+        data-auto_prompt="false">
+      </div>
+      <div class="g_id_signin"
+        data-type="standard"
+        data-size="large"
+        data-theme="outline"
+        data-text="sign_in_with"
+        data-shape="rounded"
+        data-logo_alignment="left">
+      </div>
 
     </div>
     <p class="pull-left" style="background-color:rgb(206, 206, 206);">
       <a type="button" class="btn btns-collapse btns-sm" data-toggle="offcanvas">
           <!-- <i class="glyphicon glyphicon-chevron-down"></i> -->
-          <i class='bx bx-chevron-right toggle' style="font-size:1.5em;padding-top:10px;"></i>
+          <i class='bx bx-chevron-left toggle' id="toggleButton" style="font-size:1.5em;padding-top:10px;"></i>
       </a>
     </p>
 
 
 
-    <!-- RIGHT CONTAINER -->
+
+
+
+    <!--------------- RIGHT CONTAINER ------------------->
     <div class="right-container">
       <!-- ADD RIGHT CONTAINER CONTENT HERE -->
     </div>
     <p class="pull-right" style="background-color:rgb(206, 206, 206);">
       <a type="button" class="btn btns-collapse btns-sm" data-toggle="offcanvas">
-          <i class='bx bx-chevron-left toggle' style="font-size:1.5em;padding-top:10px;"></i>
+        <i class='bx bx-chevron-right toggle' id="toggleButton" style="font-size:1.5em;padding-top:10px;"></i>
       </a>
     </p>
 
 
+    <!------------------------- MAIN -------------------------------------------->
     <div class="chat-container"></div>
     
     <div class="chat_history"></div>
@@ -127,7 +223,7 @@
         <div class="typing-textarea">
           <textarea id="chat-input" spellcheck="false" placeholder="Enter a prompt here" required style="overflow:hidden"></textarea>
 
-          <div class="typing-animation" id="key-animation" >
+          <div class="typing-animations" id="key-animation">
             <div class="typing-dot" style="--delay: 0.2s"></div>
             <div class="typing-dot" style="--delay: 0.3s"></div>
             <div class="typing-dot" style="--delay: 0.4s"></div>
@@ -159,28 +255,15 @@
     </div>
 
     <script>
-      function onSuccess(googleUser) {
-        console.log('Logged in as: ' + googleUser.getBasicProfile().getName());
-      }
-      function onFailure(error) {
-        console.log(error);
-      }
-      function renderButton() {
-        gapi.signin2.render('my-signin2', {
-          'scope': 'profile email',
-          'width': 200,
-          'height': 40,
-          'longtitle': true,
-          'theme': 'light',
-          'onsuccess': onSuccess,
-          'onfailure': onFailure,
-          'radius':30
-        });
-      }
 
-
+  
       let container_open_left = true;
       let container_open_right = true;
+
+      const toggleButton = document.getElementById('toggleButton');
+      toggleButton.addEventListener('click', function() {
+        toggleButton.classList.toggle('clicked');
+      });
 
       /* LEFT CONTAINER  */
 
@@ -236,7 +319,29 @@
           container_open_right = true
         }
       })
+      
 
+      function stickToPosition() {
+            const stickyDiv = document.querySelector('.typing-animations');
+            const rightOffset = 20; // Adjust this value to set the desired distance from the right
+            const bottomOffset = 20; // Adjust this value to set the desired distance from the bottom
+
+            const setDivPosition = () => {
+                stickyDiv.style.right = rightOffset + 'px';
+                stickyDiv.style.bottom = bottomOffset + 'px';
+            };
+
+            setDivPosition();
+            window.addEventListener('scroll', setDivPosition);
+            window.addEventListener('resize', setDivPosition);
+      }
+      
+
+
+     
+
+
+      //window.onload = stickToPosition;
 
     </script>
     <script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>

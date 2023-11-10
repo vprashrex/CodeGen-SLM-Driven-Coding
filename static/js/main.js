@@ -40,8 +40,6 @@ const loadDataFromLocalstorage = () => {
 }
 
 
-
-
 const createChatElement = (content, className) => {
     const chatDiv = document.createElement("div");
     chatDiv.classList.add("chat", className);
@@ -49,6 +47,16 @@ const createChatElement = (content, className) => {
     return chatDiv;
 }
 
+function formatTimestamp(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Month is 0-based
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
   
 const getChatResponse = async (incomingChatDiv) => {
     const API_URL = "api/instruct_resp";
@@ -70,6 +78,25 @@ const getChatResponse = async (incomingChatDiv) => {
             prompt: userText,
         })
     }
+
+    var inputWords = userText.split(" ");
+        
+    var title = inputWords.slice(0, 3).join(" ");
+
+    var titleDiv = document.getElementById("title "+sessionStorage.getItem("present_session"));
+    console.log(sessionStorage.getItem("present_session"));
+    
+    if (titleDiv){
+        if (titleDiv.innerText == "New Chat"){
+            titleDiv.innerText = title;
+        }
+
+    }
+    if (!sessionStorage.getItem("start")){
+        createNewDiv(title);
+    }
+    sessionStorage.setItem("start", true);
+
     try {
         const response = await fetch(API_URL,requestOptions);
         const contentType = response.headers.get("Content-Type");
@@ -103,23 +130,22 @@ const getChatResponse = async (incomingChatDiv) => {
             if (done){
                 going.chat = false;
                 hideAnimation();
-                /* dict.set("session_id","abcdedgassa");
-                chat_history.dataMap = dict; */
-                /* var dict = new Map();
-                console.log(chat_history.dataMap.get("session_id")) // -->session_storage.setItem("key":"value_different") */
+
+
                 const sendmsgoptions = {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
-                        question: userText,
-                        answer: result,
+                        session_id: sessionStorage.getItem("present_session"),
+                        userText: userText,
                         html: chatContainer.innerHTML,
+                        timestamp: formatTimestamp(new Date())
                     })
                 }
     
-                //const response = await (await fetch("/conv",sendmsgoptions)).json();
+                await (await fetch("/conv",sendmsgoptions)).json();
                 //chatContainer.innerHTML = response.html_code.trim();
 
                 break;
@@ -327,7 +353,8 @@ const restartResponse = () =>{
 const handleOutgoingChat = () => {
     userText = chatInput.value.trim();
     if(!userText) return;
-
+    
+    
     chatInput.value = "";
     chatInput.style.height = `${initialInputHeight}px`;
 
@@ -349,15 +376,6 @@ const handleOutgoingChat = () => {
     setTimeout(showTypingAnimation, 500);
 }
 
-deleteButton.addEventListener("click", () => {
-    if(confirm("Are you sure you want to delete all the chats?")) {
-        localStorage.removeItem("all-chats");
-        localStorage.removeItem("chat-count");
-        loadDataFromLocalstorage();
-        hideAllResponse();
-        count=0;
-    }
-});
 
 
 const initialInputHeight = chatInput.scrollHeight;
@@ -378,6 +396,165 @@ chatInput.addEventListener("keydown", (e) => {
     
 
 });
+
+
+
+
+function generateRandomString(length) {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        result += characters.charAt(randomIndex);
+    }
+    return result;
+}
+
+
+var create_div = document.getElementById("create_div");
+var id_count = 1;
+var chat_hist_cont = document.getElementById("chat-history");
+let globalDiv;
+
+
+function createNewDiv(title) {
+    var sessionId = generateRandomString(5);
+    sessionStorage.setItem(sessionId, sessionId);
+    sessionStorage.setItem("present_session",sessionId);
+    var new_div = document.createElement("div");
+    new_div.id = "history-" + sessionId;
+    new_div.className = "chat-hist-div";
+    var dict = new Map();
+    dict.set("session_id", sessionId);
+    new_div.dataMap = dict;
+
+    var deleteIcon = document.createElement("span");
+    deleteIcon.className = "fas fa-trash-alt del-icon";
+    deleteIcon.style.cursor = "pointer";
+
+    deleteIcon.addEventListener("click", function (event) {
+        event.stopPropagation();
+        deleteDiv(new_div);
+        chatContainer.innerHTML = "";
+    });
+
+    
+    
+
+    new_div.appendChild(deleteIcon);
+    /* new_div.appendChild(editIcon); */
+
+
+    var titleDiv = document.createElement("div");
+    titleDiv.innerText = title;
+    titleDiv.style.fontWeight = "bold";
+    titleDiv.id = "title "+sessionStorage.getItem("present_session");
+
+    new_div.appendChild(titleDiv);
+    chat_hist_cont.appendChild(new_div);
+
+    new_div.addEventListener("click", function () {
+        var history = document.getElementById(new_div.id);
+        console.log(history.dataMap.get("session_id"));
+        sessionStorage.setItem("session", history.dataMap.get("session_id"));
+        console.log(chatContainer.innerHTML);
+
+        // onclicking sending the session_id to the fastapi
+
+        const requestOptions = {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(
+                {
+                    session_id: history.dataMap.get("session_id")
+                }
+            )
+        }
+        const API_URL = "/session"
+        fetch(API_URL,requestOptions);
+
+    });
+
+    id_count++;
+}
+
+/* deleteButton.addEventListener("click", () => {
+    //console.log(sessionStorage.getItem("present_session"));
+   
+    
+    if(confirm("Are you sure you want to delete all the chats?")) {
+        localStorage.removeItem("all-chats");
+        localStorage.removeItem("chat-count");
+        loadDataFromLocalstorage();
+        hideAllResponse();
+        count=0;
+        const mydiv = document.getElementById("history-"+sessionStorage.getItem("present_session"))
+        mydiv.remove()
+        if (chat_hist_cont.querySelectorAll("div").length === 0) {
+            sessionStorage.removeItem("start");
+        }
+        sessionStorage.removeItem("present_session");
+        
+        
+    }
+}); */
+
+function deleteDiv(div) {
+    var sessionId = div.dataMap.get("session_id");
+    sessionStorage.removeItem(sessionId);
+    div.remove();
+    if (chat_hist_cont.querySelectorAll("div").length === 0) {
+        sessionStorage.removeItem("start");
+    }
+    localStorage.removeItem("all-chats");
+    localStorage.removeItem("chat-count");
+    loadDataFromLocalstorage();
+    hideAllResponse();
+    count=0;
+    sessionStorage.removeItem("present_session");5 76
+}
+
+
+create_div.addEventListener("click", function () {
+    sessionStorage.removeItem("present_session");
+    var inputText = chatInput.value.trim();
+    if (inputText.length > 0) {
+        var inputWords = inputText.split(" ");
+        var title = inputWords.slice(0, 3).join(" ");
+        createNewDiv(title);
+        chatInput.value = "";
+        sessionStorage.setItem("start", true);
+    }
+    else {
+        createNewDiv("New Chat");
+        sessionStorage.setItem("start", true);
+    }
+    chatContainer.innerHTML = "";
+});
+
+
+
+
+
+
+function sendChat() {
+    var inputText = chatInput.value.trim();
+
+    if (inputText.length > 0) {
+        var inputWords = inputText.split(" ");
+        var title = inputWords.slice(0, 3).join(" ");
+        if (!sessionStorage.getItem("start")) {
+            createNewDiv(title);
+        }
+        chatInput.value = inputText;
+        handleOutgoingChat();
+        sessionStorage.setItem("start", true);
+    }
+}
+
+create_div.addEventListener("click",sendChat);
 
 loadDataFromLocalstorage();
 sendButton.addEventListener("click", handleOutgoingChat);
