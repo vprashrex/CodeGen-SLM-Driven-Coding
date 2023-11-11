@@ -78,25 +78,46 @@ import redis
 import jwt
 from fastapi.responses import JSONResponse
 
-r = redis.StrictRedis(host='localhost', port=6379, db=0)
 
 router = APIRouter()
 
-class Conv(BaseModel):
-    session_id: str
-    userText: str
-    html: str
-    timestamp: str
+'''
+NOTE THIS IS FOR EXPERIMENTAL PURPOSE 
+you can remove the dict = {}
+'''
+dicts = {} 
 
-
-async def gen_id():
-    return uuid.uuid4()
-
-# redis hset
-qaList = []
 
 class ChatHtml(BaseModel):
     session_id: str
+
+############# DELETE SESSION_ID ##############
+
+'''
+THIS WILL REMOVE THE SESSION_ID FROM THE REDIS
+
+JS CODE LINE NO 475 TO 498 (main.js)
+'''
+
+@router.post("/remove_session")
+async def remove_session(session:ChatHtml):
+    try:
+        dicts.pop(session.session_id)
+    except Exception as e:
+        print(e)
+
+
+
+############### FETCH PRESENT SESSION ##############
+'''
+THIS FUNCTION WILL FETCH THE PRESENT SESSION
+AND PROVIDE HTML CODE TO THE FRONT-END
+AND FORNT-END WILL RENDER THIS HTML CODE
+
+frontend ---> present_session ---> backend ---> fetch html_code 
+---> frontend ---> render
+'''
+
 
 @router.post("/session")
 async def session(chat_request:ChatHtml):
@@ -107,58 +128,77 @@ async def session(chat_request:ChatHtml):
         return JSONResponse(content={"error":str(e)})
 
 
-@router.post("/conv")
-async def get_conv(conv: Conv):
+
+################# FETCH ALL SESSION_IDS ON RESTART #############
+
+
+'''
+THIS FUNCTION WILL FETCH ALL THE SESSION ID PRESENT IN THE 
+REDIS DATABASE ALONG WITH TITLE
+'''
+
+@router.post("/fetch_session")
+async def fetch_session(session_id:ChatHtml):
     try:
 
-        print(conv)
+        '''
+        REDIS CODE TO FETCH ALL THE SESSION ID 
+        ALONG WITH TITLE
 
-        ''' conv_id = await gen_id()
-        str_conv_id = str(conv_id)
-        question = conv.question
-        ans = conv.answer
-        html = conv.html
-        qa = {question:ans}
-        qaList.append(qa)#[{"question1":"ans1"},{"question2":"ans2"}]
-        dtime = datetime.datetime.now()
-        dtime = dtime.strftime("%d/%m/%Y, %H:%M:%S")
+        IMP DATA NEEDED : SESSION_ID AND TITLE
 
-        first_qa = qaList[0]
-        conv_title = next(iter(first_qa))
+        CLEAR THIS CODE AND WRITE YOUR OWN LOGIC
+        '''
+        print(session_id.session_id)
+        global dicts
+        return JSONResponse(
+            content={"content":dicts}
+        )
+    except Exception as e:
+        print(e)
 
-        #print(conv_title)
-        print(qaList)
-        #print(str_conv_id)
 
-        Conv_json = json.dumps({"qalist":qaList,"conv_id":str_conv_id,"conv_title":conv_title,"time":dtime})
-    
-        session_key = f"session:{str_conv_id}"
+################ STORE ALL CONVERSATION #######################
 
-        r.lpush(session_key, Conv_json)
-        r.set(session_key,html)
-        data = {"conv_id":str_conv_id, "conv_title":conv_title, "time":dtime, "exp":datetime.datetime.utcnow()+ datetime.timedelta(hours=1)}
-        secret_key = "9d38ddb8d95d5e3b6efc132b8da4a30281024696a74e385806b168c9195b26de"
-        token = jwt.encode(data, secret_key, algorithm="HS256")
-        #print("JWT Token is: ",token)
+'''
+THIS FUNCTION WILL STORE ALL THE CHAT HISTORY
+IN THE REDIS DATABASE
 
-        htmlcode = r.get(session_key)
-        print("-------------HTML CODE BELOW-------------------------")
-        html_code = htmlcode.decode("utf-8") '''
+DATA STORED
 
-       
-        ''' return JSONResponse(
-            content={
-                "html_code":htmlcode
-            },
-            status_code=200
-        ) '''
+PRESENT_SESSION
+TITLE
+userText --> question
+HTML --> UPDATABLE HTML [IMP DON'T APPEND IT INSTEAD UPDATE THE HTML COLUNM]
+TIMESTAMP
+'''
 
+
+class Conv(BaseModel):
+    session_id: str
+    title:str
+    userText: str
+    html: str
+    timestamp: str
+
+
+@router.post("/conv")
+async def store_conv(conv: Conv):
+    try:
+        '''
+        REMOVE THE EXISTING 
+        AND WRITE YOUR OWN LOGIC
+        TO STORE THE DATA IN REDIS.
+        '''
+        dicts[conv.session_id] = [conv.title,conv.html]
 
     except Exception as e:
         print(e)
 
 
-@router.post("/c/{session_id}")
+
+
+''' @router.post("/c/{session_id}")
 async def get_conv(session_id: str):
     try:
         print(session_id)
@@ -176,5 +216,5 @@ async def get_conv(session_id: str):
 
 
     except Exception as e:
-        print(e)
+        print(e) '''
 
