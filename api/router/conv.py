@@ -76,109 +76,31 @@ import datetime
 import json
 import redis
 import jwt
-from fastapi.responses import JSONResponse
 
 r = redis.StrictRedis(host='localhost', port=6379, db=0)
 
 router = APIRouter()
 
-class Conv(BaseModel):
+class ChatRequest(BaseModel):
     session_id: str
     userText: str
     html: str
+    title:str
     timestamp: str
 
-
-async def gen_id():
-    return uuid.uuid4()
-
 # redis hset
-qaList = []
-
-class ChatHtml(BaseModel):
-    session_id: str
-
-@router.post("/session")
-async def session(chat_request:ChatHtml):
+@router.post("/conv")
+async def chat(chat_request:ChatRequest):
     try:
-        print("current session : {}".format(chat_request.session_id))
+        session_id = chat_request.session_id
+        userText = chat_request.userText
+        html = chat_request.html
+        title = chat_request.title
+        timestamp = chat_request.timestamp
+
+        r.hmset(session_id, {"userText": userText, "title": title, "time": timestamp, "html": html})
+        print("Current session_id is: ",session_id)
+
     except Exception as e:
         print(e)
         return JSONResponse(content={"error":str(e)})
-
-
-@router.post("/conv")
-async def getconv(conv: Conv):
-    try:
-
-        print(conv)
-
-        ''' conv_id = await gen_id()
-        str_conv_id = str(conv_id)
-        question = conv.question
-        ans = conv.answer
-        html = conv.html
-        qa = {question:ans}
-        qaList.append(qa)#[{"question1":"ans1"},{"question2":"ans2"}]
-        dtime = datetime.datetime.now()
-        dtime = dtime.strftime("%d/%m/%Y, %H:%M:%S")
-
-        first_qa = qaList[0]
-        conv_title = next(iter(first_qa))
-
-        #print(conv_title)
-        print(qaList)
-        #print(str_conv_id)
-
-        Conv_json = json.dumps({"qalist":qaList,"conv_id":str_conv_id,"conv_title":conv_title,"time":dtime})
-    
-        session_key = f"session:{str_conv_id}"
-
-        r.lpush(session_key, Conv_json)
-        r.set(session_key,html)
-        data = {"conv_id":str_conv_id, "conv_title":conv_title, "time":dtime, "exp":datetime.datetime.utcnow()+ datetime.timedelta(hours=1)}
-        secret_key = "9d38ddb8d95d5e3b6efc132b8da4a30281024696a74e385806b168c9195b26de"
-        token = jwt.encode(data, secret_key, algorithm="HS256")
-        #print("JWT Token is: ",token)
-
-        htmlcode = r.get(session_key)
-        print("-------------HTML CODE BELOW-------------------------")
-<<<<<<< HEAD
-        #html_code = htmlcode.decode("utf-8")
-=======
-        html_code = htmlcode.decode("utf-8") '''
->>>>>>> 1d0b4e0d1ba95d7a22b9bb6851f3699b685add6f
-
-       
-        ''' return JSONResponse(
-            content={
-                "html_code":htmlcode
-            },
-            status_code=200
-        ) '''
-
-
-    except Exception as e:
-        print(e)
-
-
-@router.post("/c/{session_id}")
-async def get_conv(session_id: str):
-    try:
-        print(session_id)
-
-        with open("./api/router/1.txt","r") as f:
-            htmlcode = f.read()
-
-       
-        return JSONResponse(
-            content={
-                "html_code":htmlcode
-            },
-            status_code=200
-        )
-
-
-    except Exception as e:
-        print(e)
-
