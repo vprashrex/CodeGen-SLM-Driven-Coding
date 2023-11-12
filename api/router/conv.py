@@ -116,6 +116,8 @@ AND FORNT-END WILL RENDER THIS HTML CODE
 
 frontend ---> present_session ---> backend ---> fetch html_code 
 ---> frontend ---> render
+
+JS CODE LINE 532 - 550
 '''
 
 
@@ -123,6 +125,15 @@ frontend ---> present_session ---> backend ---> fetch html_code
 async def session(chat_request:ChatHtml):
     try:
         print("current session : {}".format(chat_request.session_id))
+        print((dicts[chat_request.session_id])[1])
+
+        # EXTRACT THE HTML FROM THE PRESENT SESSION
+        # SEND IT TO THE FRONTEND 
+        html = (dicts[chat_request.session_id])[1]
+        return JSONResponse(
+            content={"content":html},
+            status_code=200
+        )
     except Exception as e:
         print(e)
         return JSONResponse(content={"error":str(e)})
@@ -135,6 +146,10 @@ async def session(chat_request:ChatHtml):
 '''
 THIS FUNCTION WILL FETCH ALL THE SESSION ID PRESENT IN THE 
 REDIS DATABASE ALONG WITH TITLE
+
+main.js --> localrefresh()
+code line 427 - 465
+
 '''
 
 @router.post("/fetch_session")
@@ -148,6 +163,9 @@ async def fetch_session(session_id:ChatHtml):
         IMP DATA NEEDED : SESSION_ID AND TITLE
 
         CLEAR THIS CODE AND WRITE YOUR OWN LOGIC
+
+        PRESENT_SESSION --> HTML_CODE
+
         '''
         print(session_id.session_id)
         global dicts
@@ -171,6 +189,8 @@ TITLE
 userText --> question
 HTML --> UPDATABLE HTML [IMP DON'T APPEND IT INSTEAD UPDATE THE HTML COLUNM]
 TIMESTAMP
+
+MAIN.JS CODE LINE 152 - 167
 '''
 
 
@@ -189,32 +209,15 @@ async def store_conv(conv: Conv):
         REMOVE THE EXISTING 
         AND WRITE YOUR OWN LOGIC
         TO STORE THE DATA IN REDIS.
+
+        SESSION ID SHOULD BE THE KEY
+        AND ASSOCIATED INFORMATION 
+        SHOULD BE THE VALUE
+
+        # [TITLE -> 0, HTML -> 1]
         '''
         dicts[conv.session_id] = [conv.title,conv.html]
+        # [title,usertext,timestamp,html]
 
     except Exception as e:
         print(e)
-
-
-
-
-''' @router.post("/c/{session_id}")
-async def get_conv(session_id: str):
-    try:
-        print(session_id)
-
-        with open("./api/router/1.txt","r") as f:
-            htmlcode = f.read()
-
-       
-        return JSONResponse(
-            content={
-                "html_code":htmlcode
-            },
-            status_code=200
-        )
-
-
-    except Exception as e:
-        print(e) '''
-

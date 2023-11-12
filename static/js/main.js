@@ -130,24 +130,7 @@ const getChatResponse = async (incomingChatDiv) => {
             if (done){
                 going.chat = false;
                 hideAnimation();
-
-
-                const sendmsgoptions = {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        session_id: sessionStorage.getItem("present_session"),
-                        userText: userText,
-                        html: chatContainer.innerHTML,
-                        //html: localStorage.getItem(sessionStorage.getItem("present_session")),
-                        title: title ? title: titleDiv.innerText,
-                        timestamp: formatTimestamp(new Date())
-                    })
-                }
-    
-                await (await fetch("/conv",sendmsgoptions)).json();
+                
                 //chatContainer.innerHTML = response.html_code.trim();
 
                 break;
@@ -160,12 +143,36 @@ const getChatResponse = async (incomingChatDiv) => {
         pElement.classList.add("error");
         pElement.textContent = error;
     }
+
+
+
     incomingChatDiv.querySelector(".typing-animation").remove();
     incomingChatDiv.querySelector(".chat-details").appendChild(pElement);
 
+    /* CODE FOR STORING CONVERSATION IN REDIS */
+    const sendmsgoptions = {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            session_id: sessionStorage.getItem("present_session"),
+            userText: userText,
+            html: chatContainer.innerHTML,
+            title: title ? title: titleDiv.innerText,
+            timestamp: formatTimestamp(new Date())
+        })
+    }
+
+    await (await fetch("/conv",sendmsgoptions)).json();
+    /* --------------------------------------------------------------------- */
+
     localStorage.setItem("all-chats", chatContainer.innerHTML);
-    localStorage.setItem(sessionStorage.getItem("present_session"),chatContainer.innerHTML)
     chatContainer.scrollTo(0, chatContainer.scrollHeight);
+
+
+    /// once done run post all the information to the server
+
 }
 
 const copyResponse = (copyBtn) => {
@@ -444,7 +451,7 @@ async function localRefresh() {
             const session_id = key;
             const title = value[0];
             createNewDiv(title,session_id);
-            
+            // IMPORATANT CHANGE ---> CHANGE ONLY THE INDEX VALUE
             chatContainer.innerHTML = value[1];
             chatContainer.scrollTo(0, chatContainer.scrollHeight);
             
@@ -538,8 +545,12 @@ function createNewDiv(title,session_id = undefined) {
             )
         }
         const API_URL = "/session"
-        fetch(API_URL,requestOptions);
-
+        fetch(API_URL,requestOptions)
+            .then(response => response.json())
+            .then(data => chatContainer.innerHTML = data.content.trim())
+            .catch(error => console.log("Error : ",error))
+        /* const res = fetch(API_URL,requestOptions).json();
+        console.log(res) */
     });
 
     
