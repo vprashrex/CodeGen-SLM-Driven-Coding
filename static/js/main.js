@@ -422,9 +422,6 @@ chatInput.addEventListener("keydown", (e) => {
 
 });
 
-
-
-
 function generateRandomString(length) {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let result = '';
@@ -435,13 +432,10 @@ function generateRandomString(length) {
     return result;
 }
 
-
 var create_div = document.getElementById("create_div");
 var id_count = 1;
 var chat_hist_cont = document.getElementById("chat-history");
 let globalDiv
-
-
 
 async function localRefresh() {
     var sessionID = sessionStorage.getItem("present_session");
@@ -477,7 +471,6 @@ async function localRefresh() {
     } catch (error) {
         console.error("Error:", error);
     }
-
 
 }
 
@@ -531,7 +524,6 @@ function createNewDiv(title,session_id = undefined) {
         //chatContainer.innerHTML = "";
         loadDataFromLocalstorage();
     });
-
 
     new_div.appendChild(deleteIcon);
 
