@@ -67,6 +67,7 @@ async def get_conv_id(conv_id: str):
     print(conv_id)
 '''
 
+############## CODE START ########################
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
@@ -77,10 +78,10 @@ import json
 import redis
 import jwt
 
-r = redis.StrictRedis(host='localhost', port=6379, db=0)
 
 router = APIRouter()
 
+<<<<<<< HEAD
 class ChatRequest(BaseModel):
     session_id: str
     userText: str
@@ -91,6 +92,80 @@ class ChatRequest(BaseModel):
 # redis hset
 @router.post("/conv")
 async def chat(chat_request:ChatRequest):
+=======
+'''
+NOTE THIS IS FOR EXPERIMENTAL PURPOSE 
+you can remove the dict = {}
+'''
+dicts = {} 
+
+
+class ChatHtml(BaseModel):
+    session_id: str
+
+############# DELETE SESSION_ID ##############
+
+'''
+THIS WILL REMOVE THE SESSION_ID FROM THE REDIS
+
+JS CODE LINE NO 475 TO 498 (main.js)
+'''
+
+@router.post("/remove_session")
+async def remove_session(session:ChatHtml):
+    try:
+        dicts.pop(session.session_id)
+    except Exception as e:
+        print(e)
+
+
+
+############### FETCH PRESENT SESSION ##############
+'''
+THIS FUNCTION WILL FETCH THE PRESENT SESSION
+AND PROVIDE HTML CODE TO THE FRONT-END
+AND FORNT-END WILL RENDER THIS HTML CODE
+
+frontend ---> present_session ---> backend ---> fetch html_code 
+---> frontend ---> render
+
+JS CODE LINE 532 - 550
+'''
+
+
+@router.post("/session")
+async def session(chat_request:ChatHtml):
+    try:
+        print("current session : {}".format(chat_request.session_id))
+
+        # EXTRACT THE HTML FROM THE PRESENT SESSION
+        # SEND IT TO THE FRONTEND 
+        html = (dicts[chat_request.session_id])[1]
+        return JSONResponse(
+            content={"content":html},
+            status_code=200
+        )
+    except Exception as e:
+        print(e)
+        return JSONResponse(content={"error":str(e)})
+
+
+
+################# FETCH ALL SESSION_IDS ON RESTART #############
+
+
+'''
+THIS FUNCTION WILL FETCH ALL THE SESSION ID PRESENT IN THE 
+REDIS DATABASE ALONG WITH TITLE
+
+main.js --> localrefresh()
+code line 427 - 465
+
+'''
+
+@router.post("/fetch_session")
+async def fetch_session(session_id:ChatHtml):
+>>>>>>> 035e6e96e973d5036f7cf7d343f6726ab36ac495
     try:
         session_id = chat_request.session_id
         userText = chat_request.userText
@@ -98,9 +173,76 @@ async def chat(chat_request:ChatRequest):
         title = chat_request.title
         timestamp = chat_request.timestamp
 
+<<<<<<< HEAD
         r.hmset(session_id, {"userText": userText, "title": title, "time": timestamp, "html": html})
         print("Current session_id is: ",session_id)
 
     except Exception as e:
         print(e)
         return JSONResponse(content={"error":str(e)})
+=======
+        '''
+        REDIS CODE TO FETCH ALL THE SESSION ID 
+        ALONG WITH TITLE
+
+        IMP DATA NEEDED : SESSION_ID AND TITLE
+
+        CLEAR THIS CODE AND WRITE YOUR OWN LOGIC
+
+        PRESENT_SESSION --> HTML_CODE
+
+        '''
+        global dicts
+        return JSONResponse(
+            content={"content":dicts}
+        )
+    except Exception as e:
+        print(e)
+
+
+################ STORE ALL CONVERSATION #######################
+
+'''
+THIS FUNCTION WILL STORE ALL THE CHAT HISTORY
+IN THE REDIS DATABASE
+
+DATA STORED
+
+PRESENT_SESSION
+TITLE
+userText --> question
+HTML --> UPDATABLE HTML [IMP DON'T APPEND IT INSTEAD UPDATE THE HTML COLUNM]
+TIMESTAMP
+
+MAIN.JS CODE LINE 152 - 167
+'''
+
+
+class Conv(BaseModel):
+    session_id: str
+    title:str
+    userText: str
+    html: str
+    timestamp: str
+
+
+@router.post("/conv")
+async def store_conv(conv: Conv):
+    try:
+        '''
+        REMOVE THE EXISTING 
+        AND WRITE YOUR OWN LOGIC
+        TO STORE THE DATA IN REDIS.
+
+        SESSION ID SHOULD BE THE KEY
+        AND ASSOCIATED INFORMATION 
+        SHOULD BE THE VALUE
+
+        # [TITLE -> 0, HTML -> 1]
+        '''
+        dicts[conv.session_id] = [conv.title,conv.html]
+        # [title,usertext,timestamp,html]
+
+    except Exception as e:
+        print(e)
+>>>>>>> 035e6e96e973d5036f7cf7d343f6726ab36ac495
