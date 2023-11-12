@@ -545,12 +545,13 @@ function createNewDiv(title,session_id = undefined) {
             )
         }
         const API_URL = "/session"
-        fetch(API_URL,requestOptions)
-            .then(response => response.json())
-            .then(data => chatContainer.innerHTML = data.content.trim())
-            .catch(error => console.log("Error : ",error))
-        /* const res = fetch(API_URL,requestOptions).json();
-        console.log(res) */
+        fetch(API_URL, requestOptions)
+        .then(response => response.json())
+        .then(data => {
+            chatContainer.innerHTML = data.content.trim();
+            console.log(data.content.trim());
+        })
+            
     });
 
     

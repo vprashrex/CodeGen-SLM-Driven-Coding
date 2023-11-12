@@ -81,6 +81,7 @@ from fastapi.responses import JSONResponse
 
 
 router = APIRouter()
+r = redis.StrictRedis(host="localhost",port=6379,db=0)
 
 '''
 NOTE THIS IS FOR EXPERIMENTAL PURPOSE 
@@ -118,7 +119,7 @@ AND FORNT-END WILL RENDER THIS HTML CODE
 frontend ---> present_session ---> backend ---> fetch html_code 
 ---> frontend ---> render
 
-JS CODE LINE 532 - 550
+JS CODE LINE 532 - 553
 '''
 
 
@@ -129,7 +130,10 @@ async def session(chat_request:ChatHtml):
 
         # EXTRACT THE HTML FROM THE PRESENT SESSION
         # SEND IT TO THE FRONTEND 
-        html = (dicts[chat_request.session_id])[1]
+        htmlcode = r.hget(chat_request.session_id, "html")
+        html = htmlcode.decode('utf-8')
+        #print("code: ", html)
+
         return JSONResponse(
             content={"content":html},
             status_code=200
@@ -186,7 +190,7 @@ DATA STORED
 PRESENT_SESSION
 TITLE
 userText --> question
-HTML --> UPDATABLE HTML [IMP DON'T APPEND IT INSTEAD UPDATE THE HTML COLUNM]
+HTML --> UPDATABLE HTML [IMP DON'T APPEND IT INSTEAD UPDATE THE HTML COLUMN]
 TIMESTAMP
 
 MAIN.JS CODE LINE 152 - 167
@@ -204,19 +208,20 @@ class Conv(BaseModel):
 @router.post("/conv")
 async def store_conv(conv: Conv):
     try:
-        '''
-        REMOVE THE EXISTING 
-        AND WRITE YOUR OWN LOGIC
-        TO STORE THE DATA IN REDIS.
+        session_id = conv.session_id
+        userText = conv.userText
+        html = conv.html
+        title = conv.title
+        timestamp = conv.timestamp
 
-        SESSION ID SHOULD BE THE KEY
-        AND ASSOCIATED INFORMATION 
-        SHOULD BE THE VALUE
+        r.hmset(session_id, {"title": title, "html": html, "time": timestamp, "userText": userText, })
+        print("Current session_id is: ",session_id)
+        #print("html", html)
 
         # [TITLE -> 0, HTML -> 1]
-        '''
-        dicts[conv.session_id] = [conv.title,conv.html]
-        # [title,usertext,timestamp,html]
+        
+        #dicts[conv.session_id] = [conv.title,conv.html]
+        # [title,html,timestamp,usertext]
 
     except Exception as e:
         print(e)
