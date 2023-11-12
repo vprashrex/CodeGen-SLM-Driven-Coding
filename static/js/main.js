@@ -5,7 +5,6 @@ const deleteButton = document.querySelector("#delete-btn");
 const response_model_class = document.querySelector(".response-model");
 const restart_response_model = document.querySelector(".restart-response-model");
 const chat_history = document.querySelector(".chat_history");
-import { createClient } from 'redis';
 
 let count = localStorage.getItem("chat-count") || 0;
 let userText = null;
@@ -175,20 +174,6 @@ const getChatResponse = async (incomingChatDiv) => {
     /// once done run post all the information to the server
 
 }
-
-const r = createClient({
-    host: 'localhost', 
-    port: 6379,        
-  });
-
-//Getting the chat html through session_id
-r.hget(session_id, "html", (err, value) => {
-    if (err) {
-      console.error('Error getting field from Redis hash: ' + err);
-    } else {
-      console.log('Value from Redis hash: ' + value);
-    }
-  });
 
 const copyResponse = (copyBtn) => {
     // Copy the text content of the response to the clipboard
@@ -604,6 +589,9 @@ function deleteDiv(div) {
     hideAllResponse();
     count=0;
     sessionStorage.removeItem("present_session");
+    sessionStorage.removeItem("start");
+    loadDataFromLocalstorage();
+
 }
 
 
