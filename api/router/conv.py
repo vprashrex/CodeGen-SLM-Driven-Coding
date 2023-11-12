@@ -81,18 +81,6 @@ import jwt
 
 router = APIRouter()
 
-<<<<<<< HEAD
-class ChatRequest(BaseModel):
-    session_id: str
-    userText: str
-    html: str
-    title:str
-    timestamp: str
-
-# redis hset
-@router.post("/conv")
-async def chat(chat_request:ChatRequest):
-=======
 '''
 NOTE THIS IS FOR EXPERIMENTAL PURPOSE 
 you can remove the dict = {}
@@ -165,7 +153,6 @@ code line 427 - 465
 
 @router.post("/fetch_session")
 async def fetch_session(session_id:ChatHtml):
->>>>>>> 035e6e96e973d5036f7cf7d343f6726ab36ac495
     try:
         session_id = chat_request.session_id
         userText = chat_request.userText
@@ -173,14 +160,6 @@ async def fetch_session(session_id:ChatHtml):
         title = chat_request.title
         timestamp = chat_request.timestamp
 
-<<<<<<< HEAD
-        r.hmset(session_id, {"userText": userText, "title": title, "time": timestamp, "html": html})
-        print("Current session_id is: ",session_id)
-
-    except Exception as e:
-        print(e)
-        return JSONResponse(content={"error":str(e)})
-=======
         '''
         REDIS CODE TO FETCH ALL THE SESSION ID 
         ALONG WITH TITLE
@@ -245,4 +224,3 @@ async def store_conv(conv: Conv):
 
     except Exception as e:
         print(e)
->>>>>>> 035e6e96e973d5036f7cf7d343f6726ab36ac495
