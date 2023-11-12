@@ -77,6 +77,7 @@ import datetime
 import json
 import redis
 import jwt
+from fastapi.responses import JSONResponse
 
 
 router = APIRouter()
@@ -154,11 +155,6 @@ code line 427 - 465
 @router.post("/fetch_session")
 async def fetch_session(session_id:ChatHtml):
     try:
-        session_id = chat_request.session_id
-        userText = chat_request.userText
-        html = chat_request.html
-        title = chat_request.title
-        timestamp = chat_request.timestamp
 
         '''
         REDIS CODE TO FETCH ALL THE SESSION ID 
