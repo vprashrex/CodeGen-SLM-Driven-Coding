@@ -603,7 +603,7 @@ function deleteDiv(div) {
     sessionStorage.removeItem("chat-count");
     hideAllResponse();
     count=0;
-    sessionStorage.removeItem("present_session");5 76
+    sessionStorage.removeItem("present_session");
 }
 
 
