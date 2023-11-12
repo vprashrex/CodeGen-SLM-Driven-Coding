@@ -630,5 +630,4 @@ function sendChat() {
 }
 
 create_div.addEventListener("click",sendChat);
-
 sendButton.addEventListener("click", handleOutgoingChat);
