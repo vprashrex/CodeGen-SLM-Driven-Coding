@@ -126,7 +126,6 @@ JS CODE LINE 532 - 550
 async def session(chat_request:ChatHtml):
     try:
         print("current session : {}".format(chat_request.session_id))
-        print((dicts[chat_request.session_id])[1])
 
         # EXTRACT THE HTML FROM THE PRESENT SESSION
         # SEND IT TO THE FRONTEND 
@@ -168,7 +167,6 @@ async def fetch_session(session_id:ChatHtml):
         PRESENT_SESSION --> HTML_CODE
 
         '''
-        print(session_id.session_id)
         global dicts
         return JSONResponse(
             content={"content":dicts}
