@@ -110,12 +110,28 @@
     .chat-hist-div{
       display: inline-flex;
       padding:8px;
+      padding-top:12px;
       color: white;
-      width: 100%;
-      height:40px;
-      margin-top:10px;
-      margin-bottom:8px;
-      font-size:15px;
+      width: 90%;
+      height:50px;
+      margin-top:5px;
+      margin-left:12px;
+      font-size:16px;
+      cursor: pointer;
+      border-radius:8px
+    }
+    .chat-hist-div{
+      -webkit-user-select: none; /* Safari */
+      -moz-user-select: none; /* Firefox */
+      -ms-user-select: none; /* IE10+/Edge */
+      user-select: none; /* Standard syntax */
+    }
+    .chat-hist-div:hover{
+      background-color:  rgba(42,43,50);
+    }
+
+    .acitve-new_chat{
+      background-color:  rgba(42,43,50);
     }
 
     #chat-history{
@@ -145,12 +161,18 @@
 
     span.del-icon{
       position:relative;
-      left:180px;
+      left:160px;
       top:6px;
       font-size:13px;
       padding-top:1px;
     }
 
+    .chat-icon{
+      padding-top: 2px;
+    }    
+    .title-div{
+      margin-left:2px;
+    }
 
   </style>
 
@@ -190,25 +212,20 @@
       </div>
 
     </div>
-    <p class="pull-left" style="background-color:rgb(206, 206, 206);">
+    <p class="pull-left" >
       <a type="button" class="btn btns-collapse btns-sm" data-toggle="offcanvas">
           <!-- <i class="glyphicon glyphicon-chevron-down"></i> -->
-          <i class='bx bx-chevron-left toggle' id="toggleButton" style="font-size:1.5em;padding-top:10px;"></i>
+          <i class='bx bx-chevron-left toggle' id="toggleButton" style="font-size:1.8em;padding-top:10px;color:white"></i>
       </a>
     </p>
-
-
-
-
-
 
     <!--------------- RIGHT CONTAINER ------------------->
     <div class="right-container">
       <!-- ADD RIGHT CONTAINER CONTENT HERE -->
     </div>
-    <p class="pull-right" style="background-color:rgb(206, 206, 206);">
+    <p class="pull-right">
       <a type="button" class="btn btns-collapse btns-sm" data-toggle="offcanvas">
-        <i class='bx bx-chevron-right toggle' id="toggleButton" style="font-size:1.5em;padding-top:10px;"></i>
+        <i class='bx bx-chevron-right toggle' id="toggleButton" style="font-size:1.8em;padding-top:10px;color:white;"></i>
       </a>
     </p>
 
@@ -237,14 +254,7 @@
         </div>
         
         <div class="typing-controls">
-          <span id="delete-btn">
-            <svg width="28" height="32" class="delete-svg" viewBox="0 0 28 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M2 7.5H4.66667H26" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M23.3333 7.49998V27.3333C23.3333 28.0848 23.0524 28.8054 22.5523 29.3368C22.0522 29.8681 21.3739 30.1666 20.6667 30.1666H7.33333C6.62609 30.1666 5.94781 29.8681 5.44771 29.3368C4.94762 28.8054 4.66666 28.0848 4.66666 27.3333V7.49998M8.66666 7.49998V4.66665C8.66666 3.9152 8.94762 3.19453 9.44771 2.66318C9.94781 2.13182 10.6261 1.83331 11.3333 1.83331H16.6667C17.3739 1.83331 18.0522 2.13182 18.5523 2.66318C19.0524 3.19453 19.3333 3.9152 19.3333 4.66665V7.49998" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M11.3333 14.5833V23.0833" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M16.6667 14.5833V23.0833" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>                            
-          </span>
+   
       </div>
     </div>
 
@@ -322,30 +332,24 @@
       
 
       function stickToPosition() {
-            const stickyDiv = document.querySelector('.typing-animations');
-            const rightOffset = 20; // Adjust this value to set the desired distance from the right
-            const bottomOffset = 20; // Adjust this value to set the desired distance from the bottom
+        const stickyDiv = document.querySelector('.typing-animations');
+        const rightOffset = 20; // Adjust this value to set the desired distance from the right
+        const bottomOffset = 20; // Adjust this value to set the desired distance from the bottom
 
-            const setDivPosition = () => {
-                stickyDiv.style.right = rightOffset + 'px';
-                stickyDiv.style.bottom = bottomOffset + 'px';
-            };
+        const setDivPosition = () => {
+            stickyDiv.style.right = rightOffset + 'px';
+            stickyDiv.style.bottom = bottomOffset + 'px';
+        };
 
-            setDivPosition();
-            window.addEventListener('scroll', setDivPosition);
-            window.addEventListener('resize', setDivPosition);
+        setDivPosition();
+        window.addEventListener('scroll', setDivPosition);
+        window.addEventListener('resize', setDivPosition);
       }
       
-
-
-     
-
-
       //window.onload = stickToPosition;
 
     </script>
     <script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
 
-    
   </body>
 </html>

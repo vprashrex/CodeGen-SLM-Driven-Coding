@@ -1,13 +1,28 @@
 version: '3.8'
 services:
+  Dashboard:
+    image: prashrex/codegen
+    container_name: dashboard-react
+    restart: always
+    build: 
+      context: ./dashboard
+      dockerfile: Dockerfile
+    ports:
+      - 8000:3000
+    expose:
+      - 3000
+
   CodeGen:
     image: prashrex/codegen
+    container_name: codegen
     restart: always
     build:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8000:8000" 
+      - "80:80" 
+    expose:
+      - 80
     tty: true
     stdin_open: true
 
@@ -25,6 +40,7 @@ services:
     ports:
       - "6379:6379"
 
+
 networks:
-  express_nw:
+  llm-webapp-network:
     driver: bridge

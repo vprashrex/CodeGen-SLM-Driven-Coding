@@ -81,6 +81,7 @@ from fastapi.responses import JSONResponse
 
 
 router = APIRouter()
+r = redis.StrictRedis(host="localhost",port=6379,db=0)
 
 '''
 NOTE THIS IS FOR EXPERIMENTAL PURPOSE 
@@ -97,7 +98,7 @@ class ChatHtml(BaseModel):
 '''
 THIS WILL REMOVE THE SESSION_ID FROM THE REDIS
 
-JS CODE LINE NO 475 TO 498 (main.js)
+JS CODE LINE NO 500 TO 514 (main.js)
 '''
 
 @router.post("/remove_session")
@@ -118,7 +119,7 @@ AND FORNT-END WILL RENDER THIS HTML CODE
 frontend ---> present_session ---> backend ---> fetch html_code 
 ---> frontend ---> render
 
-JS CODE LINE 532 - 550
+JS CODE LINE 532 - 553
 '''
 
 
@@ -129,7 +130,13 @@ async def session(chat_request:ChatHtml):
 
         # EXTRACT THE HTML FROM THE PRESENT SESSION
         # SEND IT TO THE FRONTEND 
-        html = (dicts[chat_request.session_id])[1]
+        htmlcode = r.hget(chat_request.session_id, "html")
+        if htmlcode is not None:
+            html = htmlcode.decode('utf-8')
+        else:
+            html = None
+        #print("code: ", html)
+
         return JSONResponse(
             content={"content":html},
             status_code=200
@@ -148,7 +155,8 @@ THIS FUNCTION WILL FETCH ALL THE SESSION ID PRESENT IN THE
 REDIS DATABASE ALONG WITH TITLE
 
 main.js --> localrefresh()
-code line 427 - 465
+code line 421 - 459
+main : 437 - 455
 
 '''
 
@@ -167,7 +175,37 @@ async def fetch_session(session_id:ChatHtml):
         PRESENT_SESSION --> HTML_CODE
 
         '''
+
+
         global dicts
+
+        # redis ke undar data store
+        # fetch ---> [session_id,title] --> dicts {session_id:title}
+
+        '''
+        html = None
+        if present_session is not None:
+
+            html = r.hget(session_id,"html")
+  
+        data = r.hgetall()
+        list_of_values = []
+        dict_to_front = {}
+
+        for (k,v) in data.items():
+            session_id = k
+            title = v[0]
+            
+            if k == present_session:
+                html = v[1]
+                dict_to_front[k] = [title,html]
+
+            dict_to_front[session_id] = [title]
+
+        print(dict_to_front)
+            
+        '''
+
         return JSONResponse(
             content={"content":dicts}
         )
@@ -186,7 +224,7 @@ DATA STORED
 PRESENT_SESSION
 TITLE
 userText --> question
-HTML --> UPDATABLE HTML [IMP DON'T APPEND IT INSTEAD UPDATE THE HTML COLUNM]
+HTML --> UPDATABLE HTML [IMP DON'T APPEND IT INSTEAD UPDATE THE HTML COLUMN]
 TIMESTAMP
 
 MAIN.JS CODE LINE 152 - 167
@@ -204,19 +242,20 @@ class Conv(BaseModel):
 @router.post("/conv")
 async def store_conv(conv: Conv):
     try:
-        '''
-        REMOVE THE EXISTING 
-        AND WRITE YOUR OWN LOGIC
-        TO STORE THE DATA IN REDIS.
+        session_id = conv.session_id
+        userText = conv.userText
+        html = conv.html
+        title = conv.title
+        timestamp = conv.timestamp
 
-        SESSION ID SHOULD BE THE KEY
-        AND ASSOCIATED INFORMATION 
-        SHOULD BE THE VALUE
+        r.hmset(session_id, {"title": title, "html": html, "time": timestamp, "userText": userText, })
+        print("Current session_id is: ",session_id)
+        #print("html", html)
 
         # [TITLE -> 0, HTML -> 1]
-        '''
-        dicts[conv.session_id] = [conv.title,conv.html]
-        # [title,usertext,timestamp,html]
+        
+        #dicts[conv.session_id] = [conv.title,conv.html]
+        # [title,html,timestamp,usertext]
 
     except Exception as e:
         print(e)
