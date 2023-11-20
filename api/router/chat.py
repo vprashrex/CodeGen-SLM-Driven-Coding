@@ -40,16 +40,21 @@ from fastapi import status
 from api.custom_response import CustomJSONResponse
 from fastapi import HTTPException
 import threading
-
 stop = threading.Event()
 s = {}
+
+sentence = """India, a land of diversity and contrasts, boasts a rich tapestry of culture, history, and traditions. From the majestic Himalayas in the north to the pristine beaches in the south, India's geographical expanse is breathtaking. Its history, marked by ancient civilizations and empires, has left an indelible mark on the landscape. India's cultural mosaic is reflected in its festivals, dance forms like Bharatanatyam and Kathak, and a myriad of languages spoken across the nation.
+Despite economic challenges, India is a global player, particularly in the IT sector, showcasing rapid technological advancements. However, the country grapples with socio-economic disparities, emphasizing the need for inclusive growth. Indian cuisine, renowned worldwide for its flavors, offers a culinary journey that varies from region to region.
+"""
 
 async def generate_word(prompt: str):
     global stop
     try:
         gen_word = ["prash"," prash"," prash"]
 
-        for word in gen_word:
+        for word in sentence:
+            if s["stop"]:
+                break
             await asyncio.sleep(0.01)
             yield word
 
@@ -73,7 +78,7 @@ async def generate_word(prompt: str):
             detail="Internal Server error"
         ) from e
 
-@router.post("/api/instruct_resp", tags=["chat"])
+@router.post("/codegen/api/instruct_resp", tags=["chat"])
 async def generate(chat_request: ChatRequest):
     try:
         user_prompt = chat_request.prompt
@@ -96,7 +101,7 @@ async def generate(chat_request: ChatRequest):
             content={"error": str(e)}
         )
 
-@router.post("/api/restart")
+@router.post("/codegen/api/restart")
 async def restart_generation(chat_request: ChatRequest):
     try:
         user_prompt = chat_request.prompt
@@ -120,7 +125,7 @@ async def restart_generation(chat_request: ChatRequest):
             content={"error": str(e)}
         )
 
-@router.post("/api/stop", tags=["chat"])
+@router.post("/codegen/api/stop", tags=["chat"])
 async def stop_generation_endpoint():
     try:
         s["stop"] = True
@@ -134,4 +139,3 @@ async def stop_generation_endpoint():
             content={"error": str(e)},
             status_code=200
         )
-

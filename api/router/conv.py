@@ -98,13 +98,14 @@ class ChatHtml(BaseModel):
 '''
 THIS WILL REMOVE THE SESSION_ID FROM THE REDIS
 
-JS CODE LINE NO 475 TO 498 (main.js)
+JS CODE LINE NO 500 TO 514 (main.js)
 '''
 
 @router.post("/remove_session")
 async def remove_session(session:ChatHtml):
     try:
-        dicts.pop(session.session_id)
+        deleted = r.delete(session.session_id)
+        print("deleted session_id: ", session.session_id)
     except Exception as e:
         print(e)
 
@@ -131,7 +132,10 @@ async def session(chat_request:ChatHtml):
         # EXTRACT THE HTML FROM THE PRESENT SESSION
         # SEND IT TO THE FRONTEND 
         htmlcode = r.hget(chat_request.session_id, "html")
-        html = htmlcode.decode('utf-8')
+        if htmlcode is not None:
+            html = htmlcode.decode('utf-8')
+        else:
+            html = None
         #print("code: ", html)
 
         return JSONResponse(
@@ -152,7 +156,8 @@ THIS FUNCTION WILL FETCH ALL THE SESSION ID PRESENT IN THE
 REDIS DATABASE ALONG WITH TITLE
 
 main.js --> localrefresh()
-code line 427 - 465
+code line 421 - 459
+main : 437 - 455
 
 '''
 
@@ -171,7 +176,40 @@ async def fetch_session(session_id:ChatHtml):
         PRESENT_SESSION --> HTML_CODE
 
         '''
+
+
         global dicts
+
+        # redis ke undar data store
+        # fetch ---> [session_id,title] --> dicts {session_id:title}
+
+        session_ids = r.keys('*')
+        print(session_ids)
+
+        '''
+        html = None
+        if present_session is not None:
+
+            html = r.hget(session_id,"html")
+  
+        data = r.hgetall()
+        list_of_values = []
+        dict_to_front = {}
+
+        for (k,v) in data.items():
+            session_id = k
+            title = v[0]
+            
+            if k == present_session:
+                html = v[1]
+                dict_to_front[k] = [title,html]
+
+            dict_to_front[session_id] = [title]
+
+        print(dict_to_front)
+            
+        '''
+
         return JSONResponse(
             content={"content":dicts}
         )
