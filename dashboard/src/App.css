@@ -195,6 +195,8 @@ span.code-gen{
 	position: absolute;
 }
 
+
+
 /* --------------------------- */
 
 .navbar-text button {
@@ -346,16 +348,96 @@ nav.navbar .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
   padding: 60px 50px;
   margin-top: -60px;
 }
+
+/* --------------- CODEGEN ITEM DISPLAY ---------------- */
+
+.codegen-item {
+  display: none;
+}
+
+.item1 {
+  display: block;
+  animation: fadeInLeft 0.5s ease, slideLeft 0.5s ease; /* Add animations for item1 */
+}
+
+.item2 {
+  display: block;
+  animation: fadeInRight 0.5s ease, slideRight 0.5s ease; /* Add animations for item2 */
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideLeft {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideRight {
+  from {
+    transform: translateX(50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* ------------------------------------------------------------ */
+
+
+.codegen-bx{
+  background: #151515;
+  border-radius: 64px;
+  text-align: center;
+  padding-top:30px;
+  padding-bottom:35px;
+  margin-bottom: 26px;
+  margin-top: -8px;
+  cursor: pointer;
+}
+
+.codegen-sign{
+  left:33%;
+  top:0%;
+  padding-bottom:30px;
+  position:relative;
+}
+
+.codegen{
+  z-index: 100;
+  margin-top: 100px;
+}
+
+
 .skill h2 {
 	font-size: 45px;
 	font-weight: 700;
 }
 .skill p {
-    color: #B8B8B8;
-    font-size: 18px;
-    letter-spacing: 0.8px;
-    line-height: 1.5em;
-    margin: 14px 0 75px 0;
+  color: #B8B8B8;
+  font-size: 18px;
+  letter-spacing: 0.8px;
+  line-height: 1.5em;
+  margin: 14px 0 75px 0;
 }
 .skill-slider {
   width: 80%;
