@@ -162,3 +162,4 @@ cython_debug/
 models/
 alina-code/
 node_modules
+dashboard/node_modules
