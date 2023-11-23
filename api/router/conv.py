@@ -105,7 +105,12 @@ JS CODE LINE NO 500 TO 514 (main.js)
 async def remove_session(session:ChatHtml):
     try:
         deleted = r.delete(session.session_id)
-        print("deleted session_id: ", session.session_id)
+        retrieved_data = r.lrange("sessions", 0, -1) 
+        for i in retrieved_data:
+            dicts = json.loads(i)
+            for (k,v) in dicts.items():
+                if k == session.session_id:
+                    r.lrem("sessions",0,json.dumps({k:v}))
     except Exception as e:
         print(e)
 
@@ -147,76 +152,6 @@ async def session(chat_request:ChatHtml):
         return JSONResponse(content={"error":str(e)})
 
 
-
-################# FETCH ALL SESSION_IDS ON RESTART #############
-
-
-'''
-THIS FUNCTION WILL FETCH ALL THE SESSION ID PRESENT IN THE 
-REDIS DATABASE ALONG WITH TITLE
-
-main.js --> localrefresh()
-code line 421 - 459
-main : 437 - 455
-
-'''
-
-@router.post("/fetch_session")
-async def fetch_session(session_id:ChatHtml):
-    try:
-
-        '''
-        REDIS CODE TO FETCH ALL THE SESSION ID 
-        ALONG WITH TITLE
-
-        IMP DATA NEEDED : SESSION_ID AND TITLE
-
-        CLEAR THIS CODE AND WRITE YOUR OWN LOGIC
-
-        PRESENT_SESSION --> HTML_CODE
-
-        '''
-
-
-        global dicts
-
-        # redis ke undar data store
-        # fetch ---> [session_id,title] --> dicts {session_id:title}
-
-        session_ids = r.keys('*')
-        print(session_ids)
-
-        '''
-        html = None
-        if present_session is not None:
-
-            html = r.hget(session_id,"html")
-  
-        data = r.hgetall()
-        list_of_values = []
-        dict_to_front = {}
-
-        for (k,v) in data.items():
-            session_id = k
-            title = v[0]
-            
-            if k == present_session:
-                html = v[1]
-                dict_to_front[k] = [title,html]
-
-            dict_to_front[session_id] = [title]
-
-        print(dict_to_front)
-            
-        '''
-
-        return JSONResponse(
-            content={"content":dicts}
-        )
-    except Exception as e:
-        print(e)
-
-
 ################ STORE ALL CONVERSATION #######################
 
 '''
@@ -242,7 +177,6 @@ class Conv(BaseModel):
     html: str
     timestamp: str
 
-
 @router.post("/conv")
 async def store_conv(conv: Conv):
     try:
@@ -254,6 +188,10 @@ async def store_conv(conv: Conv):
 
         r.hmset(session_id, {"title": title, "html": html, "time": timestamp, "userText": userText, })
         print("Current session_id is: ",session_id)
+
+        session ={session_id:title} 
+        r.lpush("sessions", json.dumps(session))
+        
         #print("html", html)
 
         # [TITLE -> 0, HTML -> 1]
@@ -261,5 +199,91 @@ async def store_conv(conv: Conv):
         #dicts[conv.session_id] = [conv.title,conv.html]
         # [title,html,timestamp,usertext]
 
+    except Exception as e:
+        print(e)
+
+################# FETCH ALL SESSION_IDS ON RESTART #############
+
+
+'''
+THIS FUNCTION WILL FETCH ALL THE SESSION ID PRESENT IN THE 
+REDIS DATABASE ALONG WITH TITLE
+
+main.js --> localrefresh()
+code line 421 - 459
+main : 437 - 455
+
+'''
+@router.post("/fetch_session")
+async def fetch_session(session_id:ChatHtml):
+    try:
+
+        '''
+        REDIS CODE TO FETCH ALL THE SESSION ID 
+        ALONG WITH TITLE
+
+        IMP DATA NEEDED : SESSION_ID AND TITLE
+
+        CLEAR THIS CODE AND WRITE YOUR OWN LOGIC
+
+        PRESENT_SESSION --> HTML_CODE
+
+        '''
+
+
+        global dicts
+
+        # redis ke undar data store
+        # fetch ---> [session_id,title] --> dicts {session_id:title}
+
+        #session_ids = r.keys('*')
+        #print(session_ids)
+        datalist = []
+        retrieved_data = r.lrange("sessions", 0, -1) 
+        print(retrieved_data)
+        html = None
+        for i in retrieved_data:
+            dicts = json.loads(i)
+            datalist.append(dicts)
+            for (k,v) in dicts.items():
+                if k == session_id.session_id:
+                    htmlcode = r.hget(session_id.session_id, "html")
+                    html = htmlcode.decode('utf-8')
+
+        #print("refresh_session", refresh_session)
+        '''html = None
+        for sessions in refresh_session:
+            for (key, value) in sessions.items():
+                if key == session_id.session_id:
+                    htmlcode = r.hget(session_id.session_id, "html")
+                    html = htmlcode.decode('utf-8')'''
+    
+        '''
+        html = None
+        if present_session is not None:
+
+            html = r.hget(session_id,"html")
+  
+        data = r.hgetall()
+        list_of_values = []
+        dict_to_front = {}
+
+        for (k,v) in data.items():
+            session_id = k
+            title = v[0]
+            
+            if k == present_session:
+                html = v[1]
+                dict_to_front[k] = [title,html]
+
+            dict_to_front[session_id] = [title]
+
+        print(dict_to_front)
+            
+        '''
+
+        return JSONResponse(
+            content={"content":datalist, "html":html}
+        )
     except Exception as e:
         print(e)

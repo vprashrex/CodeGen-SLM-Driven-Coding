@@ -436,11 +436,10 @@ async function localRefresh() {
     try {
         const resp = await fetch("/fetch_session", sendmsgoptions);
         const data = await resp.json(); 
-        if (Object.keys(data.content).length === 0){
+        /*if (Object.keys(data.content).length === 0){
             console.log(data.content);
             loadDataFromLocalstorage();
         }
-        else{
             // data fetching point from redis
             // --- HETA ----
             Object.entries(data.content).forEach(([key, value]) => {
@@ -451,11 +450,23 @@ async function localRefresh() {
                 chatContainer.innerHTML = value[1];
                 chatContainer.scrollTo(0, chatContainer.scrollHeight);
                 
+            });*/
+            //console.log(data.content, data.html);
+            data.content.forEach((i) => {
+                console.log(i);
+                Object.entries(i).forEach(([key, value]) => {
+                    const session_id = key;
+                    const title = value;
+                    createNewDiv(title, session_id);
+                });
             });
-        }
-        
-        
-    } catch (error) {
+            
+                chatContainer.innerHTML = data.html;
+                chatContainer.scrollTo(0, chatContainer.scrollHeight);
+            //console.log(data.html)  
+    }
+    
+    catch (error) {
         console.error("Error:", error);
     }
 }
