@@ -9,14 +9,16 @@ const chat_history = document.querySelector(".chat_history");
 let count = localStorage.getItem("chat-count") || 0;
 let userText = null;
 const going = {
-    chat:false
+    chat:false,
+    next: false
 };
 
 
 const hideAnimation = () =>{
     document.getElementById("key-animation").style.visibility = "hidden";
-    document.getElementById("send-btn").style.visibility = "visible";
+    document.getElementById("send-btn").style.visibility = "visible"; 
 }
+
 const showAnimation = () =>{
     document.getElementById("key-animation").style.visibility = "visible";
     document.getElementById("send-btn").style.visibility = "hidden";
@@ -24,11 +26,10 @@ const showAnimation = () =>{
 
 hideAnimation();
 
-
-
 const loadDataFromLocalstorage = () => {
- 
+
     const defaultText = `<div class="default-text">
+                            <img class="logo-llm" src="./static/images/llm_logo.svg" style="width:120px;margin-top:100px;">
                             <h1>CodeGen: LLMDriven Coding</h1>
                             <p>This is a code instruct Model.</p>
                             <p>If you have any query regarding the code,<br>just type the query and you will get the answer</p>
@@ -36,7 +37,6 @@ const loadDataFromLocalstorage = () => {
 
     chatContainer.innerHTML = defaultText;
     chatContainer.scrollTo(0, chatContainer.scrollHeight);
-
 }
 
 
@@ -54,10 +54,10 @@ function formatTimestamp(date) {
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
     const seconds = String(date.getSeconds()).padStart(2, '0');
-
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
   
+
 const getChatResponse = async (incomingChatDiv) => {
     const API_URL = "codegen/api/instruct_resp";
     const pElement = document.createElement("p");
@@ -80,11 +80,8 @@ const getChatResponse = async (incomingChatDiv) => {
     }
 
     var inputWords = userText.split(" ");
-        
     var title = inputWords.slice(0, 3).join(" ");
-
     var titleDiv = document.getElementById("title "+sessionStorage.getItem("present_session"));
-    console.log(sessionStorage.getItem("present_session"));
     
     if (titleDiv){
         if (titleDiv.innerText == "New Chat"){
@@ -94,8 +91,11 @@ const getChatResponse = async (incomingChatDiv) => {
     }
     if (!sessionStorage.getItem("start")){
         createNewDiv(title);
+        showResponse();
     }
     sessionStorage.setItem("start", true);
+
+    going.next = false;
 
     try {
         const response = await fetch(API_URL,requestOptions);
@@ -107,7 +107,6 @@ const getChatResponse = async (incomingChatDiv) => {
                     return reader.read().then(({done,value}) => {
                         if(done){
                             controller.close();
-                            
                             return;
                         }
                         controller.enqueue(value);
@@ -123,16 +122,16 @@ const getChatResponse = async (incomingChatDiv) => {
         const decoder = new TextDecoder();
         let result = "";
         const reader = readableStreamResponse.body.getReader();
-        
+
         while (true){
             const {done,value} = await reader.read();
             going.chat = true;
+
+            
+            
             if (done){
                 going.chat = false;
                 hideAnimation();
-                
-                //chatContainer.innerHTML = response.html_code.trim();
-
                 break;
             }
             result += decoder.decode(value);
@@ -143,8 +142,6 @@ const getChatResponse = async (incomingChatDiv) => {
         pElement.classList.add("error");
         pElement.textContent = error;
     }
-
-
 
     incomingChatDiv.querySelector(".typing-animation").remove();
     incomingChatDiv.querySelector(".chat-details").appendChild(pElement);
@@ -168,17 +165,12 @@ const getChatResponse = async (incomingChatDiv) => {
     /* --------------------------------------------------------------------- */
     hideStop();
     restartResponse();
-                
     localStorage.setItem("all-chats", chatContainer.innerHTML);
     chatContainer.scrollTo(0, chatContainer.scrollHeight);
-
-
-    /// once done run post all the information to the server
 
 }
 
 const copyResponse = (copyBtn) => {
-    // Copy the text content of the response to the clipboard
     const reponseTextElement = copyBtn.parentElement.querySelector("p");
     navigator.clipboard.writeText(reponseTextElement.textContent);
     copyBtn.textContent = "done";
@@ -203,7 +195,6 @@ const showTypingAnimation = () => {
                 </div>
                 `;
 
-    // Create an incoming chat div with typing animation and append it to chat container
     const incomingChatDiv = createChatElement(html, "incoming");
     count++;
     
@@ -223,20 +214,20 @@ const stopResponse = () => {
         }
     };
     $.ajax({
+
         url: "codegen/api/stop",
         type: requestOptions.method,
         headers: requestOptions.headers,
         dataType: "json",
         success: function(response) {
             hideStop();
+            hideAnimation();
             restartResponse();
         },
         error: function(xhr, status, error) {
-            // Handle errors here
             console.error(status, error);
         }
     });
-    console.log("yes!")   
 }
 
 
@@ -392,13 +383,10 @@ chatInput.addEventListener("input", () => {
 
 
 chatInput.addEventListener("keydown", (e) => {
-
     if (e.key === "Enter" && !e.shiftKey && window.innerWidth > 800 && !going.chat) {
         e.preventDefault();
         handleOutgoingChat();
     }
-    
-
 });
 
 
@@ -420,6 +408,7 @@ let globalDiv
 
 async function localRefresh() {
     var sessionID = sessionStorage.getItem("present_session");
+    going.next = false;
 
     const sendmsgoptions = {
         method: "POST",
@@ -436,33 +425,44 @@ async function localRefresh() {
     try {
         const resp = await fetch("/fetch_session", sendmsgoptions);
         const data = await resp.json(); 
-        if (Object.keys(data.content).length === 0){
-            console.log(data.content);
+
+        if (data === null){
             loadDataFromLocalstorage();
         }
+
         else{
-            // data fetching point from redis
-            // --- HETA ----
-            Object.entries(data.content).forEach(([key, value]) => {
-                const session_id = key;
-                const title = value[0];
-                createNewDiv(title,session_id);
-                // IMPORATANT CHANGE ---> CHANGE ONLY THE INDEX VALUE
-                chatContainer.innerHTML = value[1];
-                chatContainer.scrollTo(0, chatContainer.scrollHeight);
-                
+            data.content.forEach((i) => {
+                console.log(i);
+                Object.entries(i).forEach(([key, value]) => {
+                    const session_id = key;
+                    const title = value;
+                    createNewDiv(title, session_id);
+                });
             });
-        }
-        
-        
-    } catch (error) {
+
+
+            if (data.html === null){
+                loadDataFromLocalstorage()
+            }
+            else{
+                chatContainer.innerHTML = data.html;
+                chatContainer.scrollTo(0, chatContainer.scrollHeight); 
+            }
+
+        }                
+    }
+    
+    catch (error) {
         console.error("Error:", error);
     }
 }
 
 localRefresh();
 
+
 function createNewDiv(title,session_id = undefined) {
+    going.next = true;
+    
     hideAllResponse();
     if (session_id === undefined){
         var sessionId = generateRandomString(5);
@@ -470,7 +470,7 @@ function createNewDiv(title,session_id = undefined) {
     else{
         sessionId = session_id;
     }
-
+    
     sessionStorage.setItem(sessionId, sessionId);
     sessionStorage.setItem("present_session",sessionId);
 
@@ -482,7 +482,6 @@ function createNewDiv(title,session_id = undefined) {
     dict.set("session_id", sessionId);
     new_div.dataMap = dict;
     document.body.appendChild(new_div);
-    /* new_div.appendChild(editIcon); */
 
     var deleteIcon = document.createElement("span");
     deleteIcon.className = "fas fa-trash-alt del-icon";
@@ -497,7 +496,6 @@ function createNewDiv(title,session_id = undefined) {
     editIcon.className = "chat-icon";
 
     deleteIcon.addEventListener("click", function (event) {
-        // ---- HETA -----
         var history = document.getElementById(new_div.id);
         console.log(history.dataMap.get("session_id"));
         const requestOptions = {
@@ -527,68 +525,73 @@ function createNewDiv(title,session_id = undefined) {
     titleDiv.className = "title-div"
     new_div.appendChild(titleDiv);
     chat_hist_cont.appendChild(new_div);
-
     // div click
     new_div.addEventListener("click", function () {
-        var history = document.getElementById(new_div.id);
-        sessionStorage.setItem("session", history.dataMap.get("session_id"));
-        sessionStorage.removeItem("present_session");
-        sessionStorage.setItem("present_session",history.dataMap.get("session_id"))
+        // setting div-click true
+        if (going.chat) {
+            var overlay = document.getElementById("overlay");
+            overlay.style.display = "block";
+            stopResponse();
+            going.chat = false;
+            setTimeout(function () {
+                hideAnimation();
+                hideLoadingOverlay();
+                executeOnClick();
+            }, 3000);
+        } else {
+            executeOnClick();
+        }
     
-        var allDivs = document.querySelectorAll('.chat-hist-div');
-        allDivs.forEach(div => {
-            div.classList.remove('acitve-new_chat');
-        });
-        // Add the 'active' class only to the clicked element
-        new_div.classList.add('acitve-new_chat');
-        const requestOptions = {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                session_id: history.dataMap.get("session_id")
-            })
-        };
-        const API_URL = "/session";
-        fetch(API_URL, requestOptions)
-        .then(response => response.json())
-        .then(data => {
-            if (data.content) {
-                chatContainer.innerHTML = data.content.trim();
-            } else {
-                loadDataFromLocalstorage();
-                hideAllResponse();      
-            }
-            var newChats = document.querySelectorAll('.chat-hist-div');
-            newChats.forEach(function (chat) {
-                chat.classList.remove('active-new_chat');
-            });        
-            new_div.classList.add("active-new_chat");
-        })
-        .catch(error => {
-            console.error('Error fetching data:', error);
-        });
-        
+        function executeOnClick() {
+            sessionStorage.setItem("new-div", true);
+            var history = document.getElementById(new_div.id);
+            sessionStorage.setItem("session", history.dataMap.get("session_id"));
+            sessionStorage.removeItem("present_session");
+            sessionStorage.setItem(
+                "present_session",
+                history.dataMap.get("session_id")
+            );
+    
+            var allDivs = document.querySelectorAll(".chat-hist-div");
+            allDivs.forEach((div) => {
+                div.classList.remove("acitve-new_chat");
+            });
+    
+            new_div.classList.add("acitve-new_chat");
+            const requestOptions = {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    session_id: history.dataMap.get("session_id"),
+                }),
+            };
+            const API_URL = "/session";
+            fetch(API_URL, requestOptions)
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.content) {
+                        chatContainer.innerHTML = data.content.trim();
+                    } else {
+                        loadDataFromLocalstorage();
+                        hideAllResponse();
+                    }
+                    var newChats = document.querySelectorAll(".chat-hist-div");
+                    newChats.forEach(function (chat) {
+                        chat.classList.remove("active-new_chat");
+                    });
+                    new_div.classList.add("active-new_chat");
+                })
+                .catch((error) => {
+                    console.error("Error fetching data:", error);
+                });
+        }
     });
+    
     id_count++;
 }
-/* deleteButton.addEventListener("click", () => {
-    //console.log(sessionStorage.getItem("present_session"));
-    if(confirm("Are you sure you want to delete all the chats?")) {
-        localStorage.removeItem("all-chats");
-        localStorage.removeItem("chat-count");
-        loadDataFromLocalstorage();
-        hideAllResponse();
-        count=0;
-        const mydiv = document.getElementById("history-"+sessionStorage.getItem("present_session"))
-        mydiv.remove()
-        if (chat_hist_cont.querySelectorAll("div").length === 0) {
-            sessionStorage.removeItem("start");
-        }
-        sessionStorage.removeItem("present_session");
-    }
-}); */
+
 
 function deleteDiv(div) {
     var sessionId = div.dataMap.get("session_id");
@@ -607,28 +610,35 @@ function deleteDiv(div) {
 
 
 create_div.addEventListener("click", function () {
-    sessionStorage.removeItem("present_session");
-    var inputText = chatInput.value.trim();
-    
-    var allDivs = document.querySelectorAll('.chat-hist-div');
-    if (allDivs){
-        allDivs.forEach(div => {
-            div.classList.remove('acitve-new_chat');
-        });
+    going.next = true;
+    if (going.next && going.chat){
+        showLoader();
     }
     
-    if (inputText.length > 0) {
-        var inputWords = inputText.split(" ");
-        var title = inputWords.slice(0, 3).join(" ");
-        createNewDiv(title);
-        chatInput.value = "";
-        sessionStorage.setItem("start", true);
+    else{
+        var inputText = chatInput.value.trim();
+        var allDivs = document.querySelectorAll('.chat-hist-div');
+        if (allDivs){
+            allDivs.forEach(div => {
+                div.classList.remove('acitve-new_chat');
+            });
+        }
+        
+        if (inputText.length > 0) {
+            var inputWords = inputText.split(" ");
+            var title = inputWords.slice(0, 3).join(" ");
+            createNewDiv(title);
+            chatInput.value = "";
+            sessionStorage.setItem("start", true);
+        }
+        else {
+            createNewDiv("New Chat");    
+            sessionStorage.setItem("start", true);
+        }
+        loadDataFromLocalstorage();
     }
-    else {
-        createNewDiv("New Chat");
-        sessionStorage.setItem("start", true);
-    }
-    loadDataFromLocalstorage();
+    
+    
 });
 
 
@@ -650,3 +660,47 @@ function sendChat() {
 
 create_div.addEventListener("click",sendChat);
 sendButton.addEventListener("click", handleOutgoingChat);
+
+/* ------- LOADER --------------------- */
+
+function showLoader() {
+    // Simulate a delay (e.g., API call, data loading)
+    var overlay = document.getElementById("overlay");
+    overlay.style.display = "block";
+    stopResponse();
+    going.chat = false;
+    going.next = false;
+    
+    setTimeout(function () {
+        var inputText = chatInput.value.trim();
+        var allDivs = document.querySelectorAll('.chat-hist-div');
+        if (allDivs){
+            allDivs.forEach(div => {
+                div.classList.remove('acitve-new_chat');
+            });
+        }
+        
+        if (inputText.length > 0) {
+            var inputWords = inputText.split(" ");
+            var title = inputWords.slice(0, 3).join(" ");
+            createNewDiv(title);
+            chatInput.value = "";
+            sessionStorage.setItem("start", true);
+        }
+        else {
+            createNewDiv("New Chat");    
+            sessionStorage.setItem("start", true);
+        }
+        loadDataFromLocalstorage();
+        hideAnimation();
+        hideLoadingOverlay();
+    }, 3000); // Adjust the delay time as needed
+  };
+
+  
+  function hideLoadingOverlay() {
+    var overlay = document.getElementById("overlay");
+    overlay.style.display = "none";
+  }
+
+/* ------------------------------------- */

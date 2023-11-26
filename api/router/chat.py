@@ -43,8 +43,7 @@ import threading
 stop = threading.Event()
 s = {}
 
-sentence = """India, a land of diversity and contrasts, boasts a rich tapestry of culture, history, and traditions. From the majestic Himalayas in the north to the pristine beaches in the south, India's geographical expanse is breathtaking. Its history, marked by ancient civilizations and empires, has left an indelible mark on the landscape. India's cultural mosaic is reflected in its festivals, dance forms like Bharatanatyam and Kathak, and a myriad of languages spoken across the nation.
-Despite economic challenges, India is a global player, particularly in the IT sector, showcasing rapid technological advancements. However, the country grapples with socio-economic disparities, emphasizing the need for inclusive growth. Indian cuisine, renowned worldwide for its flavors, offers a culinary journey that varies from region to region.
+sentence = """India, a land of diversity and contrasts, boasts a rich tapestry of culture, history, and traditions. From the majestic Himalayas in the north to the pristine beaches in the south, India's geographical expanse is breathtaking. 
 """
 
 async def generate_word(prompt: str):
