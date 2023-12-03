@@ -177,6 +177,20 @@ class Conv(BaseModel):
     html: str
     timestamp: str
 
+def check_session(session_id: str, title: str):
+    '''
+    check session id and title if it exist in database
+    '''
+
+    existing_session = r.hget(session_id,"title")
+
+    if existing_session and existing_session.decode("utf-8") == title:
+        return
+    else:
+        return True
+    
+
+
 @router.post("/conv")
 async def store_conv(conv: Conv):
     try:
@@ -186,12 +200,15 @@ async def store_conv(conv: Conv):
         title = conv.title
         timestamp = conv.timestamp
 
+        if check_session(session_id,title):
+            session ={session_id:title} 
+            r.lpush("sessions", json.dumps(session))
+
         r.hmset(session_id, {"title": title, "html": html, "time": timestamp, "userText": userText, })
         print("Current session_id is: ",session_id)
-
-        session ={session_id:title} 
-        r.lpush("sessions", json.dumps(session))
-
+        
+        
+        
 
     except Exception as e:
         print(e)
@@ -223,6 +240,7 @@ async def fetch_session(session_id:ChatHtml):
                     htmlcode = r.hget(session_id.session_id, "html")
                     if htmlcode is not None:
                         html = htmlcode.decode('utf-8')
+
 
         return JSONResponse(
             content={"content":datalist, "html":html}

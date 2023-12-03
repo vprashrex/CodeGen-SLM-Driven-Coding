@@ -40,7 +40,7 @@ export const Projects = () => {
                       <Nav.Link eventKey="second">CodeAutoComplete</Nav.Link>
                     </Nav.Item>
                     <Nav.Item>
-                      <Nav.Link eventKey="third">Tab 3</Nav.Link>
+                      <Nav.Link eventKey="third">Our Group</Nav.Link>
                     </Nav.Item>
                   </Nav>
                   
@@ -50,19 +50,7 @@ export const Projects = () => {
                           <div className="container">
                             <div className="row">
                               <div className="col-12">
-                                {/* <img style={{width:"32px",height:"32px",position:"relative",top:"40%",left:"-4%",cursor:"pointer"}} src={arrow1} alt="arrow1" onClick={() => handleArrowClick("prev")}/>
-                                  <div className="codegen-bx wow zoomIn">
-                                    <div className="codegen-item item1">
-                                      <h2 className="codegen-sign">
-                                        <img  className="codegen-img-sign" src={codegen} alt="Codegen"></img>
-                                      </h2>
-                                      <p style={{fontSize:"20px"}}>
-                                        The Code Instruction Model is designed to comprehend and interpret natural language instructions. It understands the user's intent, identifies relevant programming tasks, and translates them into a structured format that can be easily processed by the Code Generation Model. This model serves as the bridge between human-readable instructions and code-related concepts.
-                                      </p>
-                                    </div>
-                                  </div>
-                              
-                                <img style={{width:"32px",height:"32px",position:"relative",top:"-52%",right:"-101%",cursor:"pointer"}} src={arrow2} alt="arrow2" onClick={() => handleArrowClick('next')}/> */}
+                                
                                 <div>
                                   <img
                                     style={{ width: "32px", height: "32px", position: "absolute", top: "63%", left: "6%", cursor: "pointer" }}
@@ -88,7 +76,7 @@ export const Projects = () => {
                                     
                                     
                                   </div>
-                                  <div className={`codegen-item ${currentItem === 'item2' ? 'item2' : 'item1'}`} style={{ display: currentItem === 'item2' ? 'flex' : 'none' ,marginTop:"-60px",marginBlockEnd:"-60px"}}>
+                                  <div className={`codegen-item ${currentItem === 'item2' ? 'item2' : 'item1'}`} style={{ display: currentItem === 'item2' ? 'flex' : 'none' ,marginTop:"-60px",marginBlockEnd:"-60px"}}>                
                                     {currentItem === 'item2' && (
                                       <img className="anatomy" src={anatomy} alt="anatomy" ></img>
                                     )}
