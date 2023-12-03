@@ -42,7 +42,7 @@ TO DO:
 6. UPDATE CONVERSATION_TITLE --> GET CONV_ID ---> AND UPDATE THE TITLE OF CONV IN DB
 
 7. GENERATE_CONV_TITLE ---> USE CONV_ID --> TO GENERATE_THE TITLE 
-    CONV_TITLE --> WILL BE BASED ON THE FIRST QUESTION
+   CONV_TITLE --> WILL BE BASED ON THE FIRST QUESTION
 
 '''
 
@@ -51,7 +51,7 @@ TO DO:
 schema 
 
 class Conversation:
-    conv_id: str(uuid.uuid4())
+    conv_id: str(uuid.uuid4())  
     conv_title: first_question
     q/a: [{q:a},{q:a},{q:a}] 
     datetime: timestamp
@@ -104,7 +104,7 @@ JS CODE LINE NO 500 TO 514 (main.js)
 @router.post("/remove_session")
 async def remove_session(session:ChatHtml):
     try:
-        deleted = r.delete(session.session_id)
+        r.delete(session.session_id)
         retrieved_data = r.lrange("sessions", 0, -1) 
         for i in retrieved_data:
             dicts = json.loads(i)
@@ -189,15 +189,9 @@ async def store_conv(conv: Conv):
         r.hmset(session_id, {"title": title, "html": html, "time": timestamp, "userText": userText, })
         print("Current session_id is: ",session_id)
 
-        session ={session_id:title} 
+        session ={session_id:title}
         r.lpush("sessions", json.dumps(session))
-        
-        #print("html", html)
 
-        # [TITLE -> 0, HTML -> 1]
-        
-        #dicts[conv.session_id] = [conv.title,conv.html]
-        # [title,html,timestamp,usertext]
 
     except Exception as e:
         print(e)
@@ -217,70 +211,19 @@ main : 437 - 455
 @router.post("/fetch_session")
 async def fetch_session(session_id:ChatHtml):
     try:
-
-        '''
-        REDIS CODE TO FETCH ALL THE SESSION ID 
-        ALONG WITH TITLE
-
-        IMP DATA NEEDED : SESSION_ID AND TITLE
-
-        CLEAR THIS CODE AND WRITE YOUR OWN LOGIC
-
-        PRESENT_SESSION --> HTML_CODE
-
-        '''
-
-
-        global dicts
-
-        # redis ke undar data store
-        # fetch ---> [session_id,title] --> dicts {session_id:title}
-
-        #session_ids = r.keys('*')
-        #print(session_ids)
         datalist = []
         retrieved_data = r.lrange("sessions", 0, -1) 
-        print(retrieved_data)
         html = None
+
         for i in retrieved_data:
             dicts = json.loads(i)
             datalist.append(dicts)
             for (k,v) in dicts.items():
                 if k == session_id.session_id:
                     htmlcode = r.hget(session_id.session_id, "html")
-                    html = htmlcode.decode('utf-8')
-
-        #print("refresh_session", refresh_session)
-        '''html = None
-        for sessions in refresh_session:
-            for (key, value) in sessions.items():
-                if key == session_id.session_id:
-                    htmlcode = r.hget(session_id.session_id, "html")
-                    html = htmlcode.decode('utf-8')'''
-    
-        '''
-        html = None
-        if present_session is not None:
-
-            html = r.hget(session_id,"html")
-  
-        data = r.hgetall()
-        list_of_values = []
-        dict_to_front = {}
-
-        for (k,v) in data.items():
-            session_id = k
-            title = v[0]
-            
-            if k == present_session:
-                html = v[1]
-                dict_to_front[k] = [title,html]
-
-            dict_to_front[session_id] = [title]
-
-        print(dict_to_front)
-            
-        '''
+                    if htmlcode is not None:
+                        html = htmlcode.decode('utf-8')
+        print("datalist: ",datalist)
 
         return JSONResponse(
             content={"content":datalist, "html":html}
