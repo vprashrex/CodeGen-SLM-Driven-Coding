@@ -30,7 +30,7 @@
 - :white_check_mark: **Cloud Storage of Chat history**: Provide a cloud storage for authenticated users. [Collaboration with <a href="https://github.com/HetaVyas">Heta Vyas</a>]
 
 ## Demo Highlights 🎥
-
+<video src="./assests/codegen.MP4"></video>
 
 ## Setup
 
