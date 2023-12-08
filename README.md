@@ -1,12 +1,29 @@
-## CodeGen: SLM Driven Coding
+# CodeGen: SLM (Small Language Model) Driven Coding
+
+<div align="center">
+    <img src="./static/images/llm_logo.svg" alt="SLM-LOGO" width="30%" style="border-radius: 50%; padding-bottom: 20px"/>
+</div>
+
+<h2>What is CodeGen?</h2>
+<p>Enhancing the replitv3 3B language model's code generation by ongoing diverse language training,
+  employing fine-tuning for accurate pattern prediction in coding paradigms.</p>
+
+<ul>
+  <li>Tools: FastAPI, Docker (with watchtower enabled), GitHub Actions, React JS, HTML, CSS, Vanilla JS,Redis.</li>
+  <li>Technologies: OAuth, JWT, Google Sign-In</li>
+  <li>Machine Learning Models: Replitv3 3B (3B parameter Causal Language Model focused on CodeInstruction, employing ggml quantization for faster inference)</li>
+</ul>
+<br>
 
 
-:triangular_flag_on_post: **Updates**
+## Key Features 🎯
 
-- :white_check_mark: Added server.py script for inferencing the CodeGen on web
-- :white_check_mark: Updated Dockerfile && docker-compose.yml to run the webapplication easily 
-- :white_check_mark: removed dead code in ctransformer module
-
+- :white_check_mark: **Fast & Efficient**: Models are qunatized using ggml to 4bit to provide faster inference on edge device
+- :white_check_mark: **Secure**: Made with security in mind, Your data your control.
+- :white_check_mark: **Docker Support**: Comes with docker support, which makes it cross-platform and can be run on any os
+- :white_check_mark: **Offline Mode**: Works in offline Mode, so that your data is with you only. 
+- :white_check_mark: **Redis Chat history**: Comes with chat history support so that you can navigate to your queries. [Collaboration with <a href="https://github.com/HetaVyas">Heta Vyas</a>]
+- :white_check_mark: 
 
 ## Setup
 
