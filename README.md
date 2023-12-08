@@ -23,7 +23,14 @@
 - :white_check_mark: **Docker Support**: Comes with docker support, which makes it cross-platform and can be run on any os
 - :white_check_mark: **Offline Mode**: Works in offline Mode, so that your data is with you only. 
 - :white_check_mark: **Redis Chat history**: Comes with chat history support so that you can navigate to your queries. [Collaboration with <a href="https://github.com/HetaVyas">Heta Vyas</a>]
-- :white_check_mark: 
+
+## Future ideas & implementation
+- :white_check_mark: **Content Moderation**: Controlling the behaviour of model to not provide harmful asnwers & query, and also it should only provide code.
+- :white_check_mark: **Authentication & Security** [Collaboration with <a href="https://github.com/HetaVyas">Heta Vyas</a>]
+- :white_check_mark: **Cloud Storage of Chat history**: Provide a cloud storage for authenticated users. [Collaboration with <a href="https://github.com/HetaVyas">Heta Vyas</a>]
+
+## Demo Highlights 🎥
+
 
 ## Setup
 
