@@ -1,18 +1,19 @@
 import { Container, Row, Col, Tab, Nav } from "react-bootstrap";
 import colorSharp2 from "../assets/img/color-sharp2.png";
 import codegen from "../assets/img/codegen.svg";
-import anatomy from "../assets/img/anatomy.svg";
 import arrow1 from "../assets/img/arrow1.svg";
 import arrow2 from "../assets/img/arrow2.svg";
-import React, { useState } from 'react';
-
-
-
+import React, { useState,lazy,Suspense } from 'react';
 import 'animate.css';
 import TrackVisibility from 'react-on-screen';
 
+
+
 export const Projects = () => {
   const [currentItem, setCurrentItem] = useState('item1');
+
+  const LazyLoadedAnatomyComponent = lazy(() => import("./AnatomyComponent"));
+
 
   const handleArrowClick = (direction) => {
     if (direction === 'prev') {
@@ -29,8 +30,8 @@ export const Projects = () => {
             <TrackVisibility>
               {({ isVisible }) =>
               <div className={isVisible ? "animate__animated animate__fadeIn": ""}>
-                <h2>LLM DRIVEN CODING</h2>
-                <p> Large Language Model (LLM) driven coding, which involves using a language model to generate and complete code based on user instructions. This can be a powerful approach for automating certain aspects of coding.</p>
+                <h2>SLM DRIVEN CODING</h2>
+                <p> Small Language Model (SLM) driven coding, which involves using a language model to generate and complete code based on user instructions. This can be a powerful approach for automating certain aspects of coding.</p>
                 <Tab.Container id="projects-tabs" defaultActiveKey="first">
                   <Nav variant="pills" className="nav-pills mb-5 justify-content-center align-items-center" id="pills-tab">
                     <Nav.Item>
@@ -53,7 +54,7 @@ export const Projects = () => {
                                 
                                 <div>
                                   <img
-                                    style={{ width: "32px", height: "32px", position: "absolute", top: "63%", left: "6%", cursor: "pointer" }}
+                                    style={{ width: "32px", height: "32px", position: "relative",left:"-45px",bottom:"-200px"}}
                                     src={arrow1}
                                     alt="arrow1"
                                     onClick={() => handleArrowClick("prev")}
@@ -76,14 +77,15 @@ export const Projects = () => {
                                     
                                     
                                   </div>
-                                  <div className={`codegen-item ${currentItem === 'item2' ? 'item2' : 'item1'}`} style={{ display: currentItem === 'item2' ? 'flex' : 'none' ,marginTop:"-60px",marginBlockEnd:"-60px"}}>                
-                                    {currentItem === 'item2' && (
-                                      <img className="anatomy" src={anatomy} alt="anatomy" ></img>
-                                    )}
-                                  </div>
-                                  
+                                  <Suspense fallback={<div class="loading" style={{fontSize:"50px"}}>Loading...</div>}>
+                                    <div className={`codegen-item ${currentItem === 'item2' ? 'item2' : 'item1'}`} style={{ display: currentItem === 'item2' ? 'flex' : 'none', marginTop: "-60px", marginBlockEnd: "-60px" }}>
+                                      {currentItem === 'item2' && (
+                                        <LazyLoadedAnatomyComponent />
+                                      )}
+                                    </div>
+                                  </Suspense>
                                   <img
-                                    style={{ width: "32px", height: "32px", position: "absolute", top: "63%", right: "6%", cursor: "pointer" }}
+                                    style={{ width: "32px", height: "32px", position: "relative",left:"1260px",top:"-260px", cursor: "pointer" }}
                                     src={arrow2}
                                     alt="arrow2"
                                     onClick={() => handleArrowClick('next')}

@@ -49,15 +49,15 @@ sentence = """India, a land of diversity and contrasts, boasts a rich tapestry o
 async def generate_word(prompt: str):
     global stop
     try:
-        gen_word = ["prash"," prash"," prash"]
+        ''' gen_word = ["prash"," prash"," prash"]
 
         for word in sentence:
             if s["stop"]:
                 break
             await asyncio.sleep(0.01)
-            yield word
+            yield word '''
 
-        ''' async with load_model() as model:
+        async with load_model() as model:
             loop = asyncio.get_event_loop()
             future = loop.run_in_executor(None, model.infer, prompt)
             gen_word = await asyncio.wait_for(future, 120)
@@ -65,7 +65,8 @@ async def generate_word(prompt: str):
                 if s["stop"]:
                     break
                 await asyncio.sleep(0.01)
-                yield word '''
+                yield word
+
     except asyncio.TimeoutError:
         raise HTTPException(
             status_code=status.HTTP_408_REQUEST_TIMEOUT,

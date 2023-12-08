@@ -13,7 +13,7 @@ export const Footer = () => {
             <img src={logo} alt="Logo" />
           </Col>
           <Col size={12} sm={6} className="text-center text-sm-end">
-            
+            <p style={{fontSize:"20px"}}>CodeGen: SLM Driven Coding</p>
           </Col>
         </Row>
       </Container>
