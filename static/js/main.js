@@ -30,7 +30,8 @@ const loadDataFromLocalstorage = () => {
 
     const defaultText = `<div class="default-text">
                             <img class="logo-llm" src="./static/images/llm_logo.svg" style="width:120px;margin-top:100px;">
-                            <h1>CodeGen: LLMDriven Coding</h1>
+                            <h1>CodeGen: SLMDriven Coding</h1>
+                            <h2>SLM (Small Language Model)</h2>
                             <p>This is a code instruct Model.</p>
                             <p>If you have any query regarding the code,<br>just type the query and you will get the answer</p>
                         </div>`
@@ -56,7 +57,6 @@ function formatTimestamp(date) {
     const seconds = String(date.getSeconds()).padStart(2, '0');
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
-  
 
 const getChatResponse = async (incomingChatDiv) => {
     const API_URL = "codegen/api/instruct_resp";
@@ -78,7 +78,8 @@ const getChatResponse = async (incomingChatDiv) => {
             prompt: userText,
         })
     }
-
+    
+    let send_title = ""
     var inputWords = userText.split(" ");
     var title = inputWords.slice(0, 3).join(" ");
     var titleDiv = document.getElementById("title "+sessionStorage.getItem("present_session"));
@@ -86,10 +87,12 @@ const getChatResponse = async (incomingChatDiv) => {
     if (titleDiv){
         if (titleDiv.innerText == "New Chat"){
             titleDiv.innerText = title;
+            send_title = titleDiv.innerText;
         }
 
     }
     if (!sessionStorage.getItem("start")){
+        send_title = title;
         createNewDiv(title);
         showResponse();
     }
@@ -127,8 +130,6 @@ const getChatResponse = async (incomingChatDiv) => {
             const {done,value} = await reader.read();
             going.chat = true;
 
-            
-            
             if (done){
                 going.chat = false;
                 hideAnimation();
@@ -156,7 +157,7 @@ const getChatResponse = async (incomingChatDiv) => {
             session_id: sessionStorage.getItem("present_session"),
             userText: userText,
             html: chatContainer.innerHTML,
-            title: title ? title: titleDiv.innerText,
+            title: send_title ? send_title: titleDiv.innerText,
             timestamp: formatTimestamp(new Date())
         })
     }
@@ -214,7 +215,6 @@ const stopResponse = () => {
         }
     };
     $.ajax({
-
         url: "codegen/api/stop",
         type: requestOptions.method,
         headers: requestOptions.headers,
@@ -311,7 +311,6 @@ const hideStop = () => {
 }
 
 const hideRestart = () => {
-    console.log("hideRestart")
     restart_response_model.classList.add("hidden");
 }
 
@@ -350,8 +349,7 @@ const restartResponse = () =>{
 const handleOutgoingChat = () => {
     userText = chatInput.value.trim();
     if(!userText) return;
-    
-    
+
     chatInput.value = "";
     chatInput.style.height = `${initialInputHeight}px`;
 
@@ -379,8 +377,6 @@ chatInput.addEventListener("input", () => {
     chatInput.style.height =  `${initialInputHeight}px`;
     chatInput.style.height = `${chatInput.scrollHeight}px`;
 });
-
-
 
 chatInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter" && !e.shiftKey && window.innerWidth > 800 && !going.chat) {
@@ -698,9 +694,9 @@ function showLoader() {
   };
 
   
-  function hideLoadingOverlay() {
+function hideLoadingOverlay() {
     var overlay = document.getElementById("overlay");
     overlay.style.display = "none";
-  }
+}
 
 /* ------------------------------------- */

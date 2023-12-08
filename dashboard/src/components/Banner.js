@@ -56,11 +56,11 @@ export const Banner = () => {
             <TrackVisibility>
               {({ isVisible }) =>
               <div className={isVisible ? "animate__animated animate__fadeIn" : ""}>
-                <span className="tagline" style={{marginLeft:'20px'}}>LLM Driven Coding</span>
+                <span className="tagline" style={{marginLeft:'20px'}}>SLM Driven Coding</span>
                 <h1><span style={{marginLeft:'20px'}} className="txt-rotate" dataPeriod="1000" data-rotate='[ "CodeGen", "Code AutoComplete"]'><span className="wrap">{text}</span></span></h1>
                 
                 <span className="code-gen">
-                  <button onClick={() => window.location.href="http://localhost:8000/codegen"} className="vvd"><span>CodeGen <ArrowRightCircle size={25} /></span></button>
+                  <button onClick={() => window.location.href="http://127.0.0.1:8000/codegen"} className="vvd"><span>CodeGen <ArrowRightCircle size={25} /></span></button>
                   <button style={{marginLeft:'80px'}} onClick={() => console.log('connect')} className="vvd"><span>Code AutoComplete <ArrowRightCircle size={25} /></span></button>
 
                 </span>

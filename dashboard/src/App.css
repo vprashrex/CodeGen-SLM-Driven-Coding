@@ -90,12 +90,16 @@ nav.navbar {
   z-index: 9999;
   transition:  0.32s ease-in-out;
 }
+
+
+
+
 nav.navbar.scrolled {
   padding: 0px 0;
   background-color: #121212;
 }
 nav.navbar a.navbar-brand {
-    width: 9%;
+  width: 9%;
 }
 nav.navbar .navbar-nav .nav-link.navbar-link {
   position: relative;
@@ -195,7 +199,13 @@ span.code-gen{
 	position: absolute;
 }
 
+.nav-pills{
+  cursor: pointer;
+}
 
+.typing-text {
+  transition: opacity 0.5s ease-in-out; /* Adjust the duration and timing function as needed */
+}
 
 /* --------------------------- */
 

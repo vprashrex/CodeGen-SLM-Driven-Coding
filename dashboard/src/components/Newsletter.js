@@ -1,45 +1,61 @@
 import { useState, useEffect } from "react";
-import { Col, Row, Alert } from "react-bootstrap";
+import { Col } from "react-bootstrap";
 
-export const Newsletter = ({ status, message, onValidated }) => {
-  const [email, setEmail] = useState('');
+export const Newsletter = () => {
+  const [loopNum, setLoopNum] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [text, setText] = useState('');
+  const [opacity, setOpacity] = useState(1);  // Define opacity state
+  const [delta, setDelta] = useState(150);
+  const [index, setIndex] = useState(1);
+  const toRotate = ["Print the Fibonacci series using the recursive method", "Convert Celsius to Fahrenheit."];
+  const period = 2000;
 
   useEffect(() => {
-    if (status === 'success') clearFields();
-  }, [status])
+    let ticker = setInterval(() => {
+      tick();
+    }, delta);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    email &&
-    email.indexOf("@") > -1 &&
-    onValidated({
-      EMAIL: email
-    })
+    return () => { clearInterval(ticker) };
+  }, [text, opacity]);
+
+  const tick = () => {
+    let i = loopNum % toRotate.length;
+    let fullText = toRotate[i];
+    let updatedText = isDeleting ? fullText.substring(0, text.length - 1) : fullText.substring(0, text.length + 1);
+
+    setText(updatedText);
+
+    if (isDeleting) {
+      setDelta((prevDelta) => prevDelta / 2);
+    }
+
+    if ((!isDeleting && updatedText === fullText) || (isDeleting && updatedText === '')) {
+      setIsDeleting(!isDeleting);
+      setLoopNum(isDeleting ? loopNum + 1 : loopNum);
+      setIndex(isDeleting ? 1 : index - 1);
+      setDelta(isDeleting ? 500 : period);
+
+      // If typing is completed, start fading out the text
+      if (!isDeleting) {
+        setTimeout(() => {
+          setOpacity(0);
+        }, 500); // Adjust the duration as needed
+      } else {
+        setOpacity(1); // Reset opacity when starting a new text
+      }
+    } else {
+      setIndex((prevIndex) => prevIndex + (isDeleting ? 0 : 1));
+    }
   }
-
-  const clearFields = () => {
-    setEmail('');
-  }
-
+  
   return (
       <Col lg={12}>
         <div className="newsletter-bx wow slideInUp">
-          <Row>
-            <Col lg={12} md={6} xl={5}>
-              <h3>Subscribe to our Newsletter<br></br> & Never miss latest updates</h3>
-              {status === 'sending' && <Alert>Sending...</Alert>}
-              {status === 'error' && <Alert variant="danger">{message}</Alert>}
-              {status === 'success' && <Alert variant="success">{message}</Alert>}
-            </Col>
-            <Col md={6} xl={7}>
-              <form onSubmit={handleSubmit}>
-                <div className="new-email-bx">
-                  <input value={email} type="email" onChange={(e) => setEmail(e.target.value)} placeholder="Email Address" />
-                  <button type="submit">Submit</button>
-                </div>
-              </form>
-            </Col>
-          </Row>
+              <h3>Enter Prompt<br></br></h3>
+              <h1 className="typing-text"><span className="txt-rotate" dataPeriod="2000" data-rotate='[ "Print the Fibonacci series using the recursive method", "Convert Celsius to Fahrenheit."]'><span className="wrap">{text}</span></span></h1>
+
+              
         </div>
       </Col>
   )

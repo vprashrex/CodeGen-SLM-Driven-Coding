@@ -18,7 +18,7 @@ export const Footer = () => {
 <<<<<<< HEAD
 =======
           <Col size={12} sm={6} className="text-center text-sm-end">
-            
+            <p style={{fontSize:"20px"}}>CodeGen: SLM Driven Coding</p>
           </Col>
 >>>>>>> f309df7cd447a7a022f8f1c8f070ecf101e0230b
         </Row>
