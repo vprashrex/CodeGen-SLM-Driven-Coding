@@ -34,12 +34,16 @@ export const NavBar = () => {
       <Navbar expand="md" className={scrolled ? "scrolled" : ""}>
         <Container>
           <Navbar.Brand href="/">
+<<<<<<< HEAD
+            <img src={logo} alt="Logo" style = {{left:"9%", position:"relative", marginTop:"10px"}}/>
+=======
             <img src={logo} alt="Logo" 
               style={{
                 transform: `scale(${scrolled ? 0.8 : 1})`, // Adjust the scale based on the scroll position
                 transition: "transform 0.3s ease", // Add a smooth transition effect
               }}
             />
+>>>>>>> fc2ba2e5c9cae31cb8f8b988a6a6eac8fe3709ff
           </Navbar.Brand>
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="ms-auto">

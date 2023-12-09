@@ -139,4 +139,3 @@ async def stop_generation_endpoint():
             content={"error": str(e)},
             status_code=200
         )
-

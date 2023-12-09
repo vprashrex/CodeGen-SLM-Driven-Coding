@@ -42,7 +42,7 @@ TO DO:
 6. UPDATE CONVERSATION_TITLE --> GET CONV_ID ---> AND UPDATE THE TITLE OF CONV IN DB
 
 7. GENERATE_CONV_TITLE ---> USE CONV_ID --> TO GENERATE_THE TITLE 
-    CONV_TITLE --> WILL BE BASED ON THE FIRST QUESTION
+   CONV_TITLE --> WILL BE BASED ON THE FIRST QUESTION
 
 '''
 
@@ -51,7 +51,7 @@ TO DO:
 schema 
 
 class Conversation:
-    conv_id: str(uuid.uuid4())
+    conv_id: str(uuid.uuid4())  
     conv_title: first_question
     q/a: [{q:a},{q:a},{q:a}] 
     datetime: timestamp
@@ -240,6 +240,7 @@ async def fetch_session(session_id:ChatHtml):
                     htmlcode = r.hget(session_id.session_id, "html")
                     if htmlcode is not None:
                         html = htmlcode.decode('utf-8')
+        print("datalist: ",datalist)
 
 
         return JSONResponse(

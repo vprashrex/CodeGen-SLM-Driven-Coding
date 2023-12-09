@@ -65,4 +65,9 @@ uvicorn server:app --reload
 ```
 
 # Run using Docker
-
+```sh
+docker-compose build
+```
+```sh
+docker-compose up
+```

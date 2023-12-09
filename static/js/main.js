@@ -657,7 +657,7 @@ function sendChat() {
 create_div.addEventListener("click",sendChat);
 sendButton.addEventListener("click", handleOutgoingChat);
 
-/* ------- LOADER --------------------- */
+/* ----------------- LOADER --------------------- */
 
 function showLoader() {
     // Simulate a delay (e.g., API call, data loading)
