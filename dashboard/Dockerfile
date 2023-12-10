@@ -1,6 +1,6 @@
-FROM node:14-alpine
+FROM node:18 as build
 
-WORKDIR /dashboard
+WORKDIR /react-dashboard
 
 COPY package*.json ./
 
@@ -10,6 +10,10 @@ COPY . .
 
 RUN npm run build
 
-EXPOSE 3000
+FROM nginx:alpine
 
-CMD ["npm", "start"]
+COPY --from=build /react-dashboard/build /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
