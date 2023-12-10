@@ -32,11 +32,6 @@
 ## Demo Highlights 🎥
 <video src="./assests/codegen.MP4"></video>
 
-## Contributors ✨
-<a href="https://github.com/vprashrex/codegen-slm-driven-coding/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=vprashrex/codegen-slm-driven-coding" />
-</a>
-
 
 ## Setup
 
