@@ -1,7 +1,6 @@
 import os
 from ctransformers import AutoModelForCausalLM, AutoConfig
 from dataclasses import dataclass,asdict
-import concurrent.futures
 
 @dataclass
 class GenerationConfig:
@@ -17,7 +16,7 @@ class GenerationConfig:
     stop: list
 
 class ModelsPath:
-    CODE_GEN_MODEL = "./models/instruct/replit-v2-codeinstruct-3b.q4_1.bin"
+    CODE_GEN_MODEL = "./models/autocomplete/WizardCoder-1B-V1.0-ggml-q4_1.bin"
 
 
 class CodeGen:
@@ -39,16 +38,16 @@ class CodeGen:
     # GENERATE WORD WITH TIMEOUT_CONDITION
     def generate(self,llm: AutoModelForCausalLM,generation_config: GenerationConfig,user_prompt:str):
         return llm(
-            self.format_prompt(user_prompt),
+            user_prompt,
             **asdict(generation_config)
         )
     
     def initliaze_model(self):
         if self.model is None:
-            config = AutoConfig.from_pretrained(os.path.abspath("./models/instruct/"),context_length=self.MAX_LENGTH)
+            config = AutoConfig.from_pretrained(os.path.abspath("./models"),context_length=self.MAX_LENGTH)
             self.model = AutoModelForCausalLM.from_pretrained(
                 ModelsPath.CODE_GEN_MODEL,
-                model_type="replit",
+                model_type="starcoder",
                 config=config
             )
 
@@ -61,7 +60,7 @@ class CodeGen:
             repetition_penalty=1.0,
             max_new_tokens=512,  # adjust as needed
             seed=42,
-            reset=False,  # reset history (cache)
+            reset=True,  # reset history (cache)
             stream=True,  # streaming per word/token
             threads=int(os.cpu_count() / 6),  # adjust for your CPU
             stop=["<|endoftext|>"],
@@ -80,7 +79,7 @@ class CodeGen:
 if __name__ == '__main__':
     try:
         code_gen = CodeGen()
-        gen_word = code_gen.infer("print hello world")
+        gen_word = code_gen.infer("def fibonacci(")
         for word in gen_word:
             print(word,end="",flush=True)
         print("")

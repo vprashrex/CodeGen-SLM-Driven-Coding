@@ -14,6 +14,13 @@ const going = {
 };
 
 
+// endpoint name :
+/* ------------------------------------------------------------- */
+const currentPath = window.location.pathname;
+console.log("pathname the website is working : ",currentPath)
+/* ----------------------------------------------------------- */
+
+
 const hideAnimation = () =>{
     document.getElementById("key-animation").style.visibility = "hidden";
     document.getElementById("send-btn").style.visibility = "visible"; 
@@ -59,7 +66,7 @@ function formatTimestamp(date) {
 }
 
 const getChatResponse = async (incomingChatDiv) => {
-    const API_URL = "codegen/api/instruct_resp";
+    const API_URL = `${currentPath}/api/instruct_resp`;
     const pElement = document.createElement("p");
 
     if (document.getElementById("restart")){
@@ -215,7 +222,7 @@ const stopResponse = () => {
         }
     };
     $.ajax({
-        url: "codegen/api/stop",
+        url: `${currentPath}/api/stop`,
         type: requestOptions.method,
         headers: requestOptions.headers,
         dataType: "json",
@@ -232,7 +239,7 @@ const stopResponse = () => {
 
 
 const restart_generation = async () => {
-    const API_URL = "codegen/api/restart";
+    const API_URL = `${currentPath}/api/restart`;
     
     const chat_count = `.chat.incoming.chat-${localStorage.getItem("chat-count")}`;
     const incomingChatDiv = document.querySelector(chat_count);

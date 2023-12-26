@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from api.pipeline import model_api
+from api.pipeline import complete_api
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 from fastapi.responses import StreamingResponse
@@ -9,14 +9,10 @@ import io
 import sys
 import asyncio
 
-''''
-1. TIMEOUT EXECUTION
-2. USER INTERRUPTION
-3. REGENERATE RESPONSE
-'''
+
 
 router = APIRouter()
-model = model_api.CodeGen()
+model = complete_api.CodeGen()
 
 
 async def stram_buffer(word:str):
@@ -28,7 +24,7 @@ async def stram_buffer(word:str):
     return out
 
 @asynccontextmanager
-async def load_model() -> AsyncGenerator[model_api.CodeGen,None]:
+async def load_model() -> AsyncGenerator[complete_api.CodeGen,None]:
     try:
         yield model
     
@@ -43,29 +39,34 @@ import threading
 stop = threading.Event()
 s = {}
 
-sentence = """Codegen is working ..., a land of diversity and contrasts, boasts a rich tapestry of culture, history, and traditions. From the majestic Himalayas in the north to the pristine beaches in the south, India's geographical expanse is breathtaking. 
+sentence = """Autocomplete senetecne is working .... , a land of diversity and contrasts, boasts a rich tapestry of culture, history, and traditions. From the majestic Himalayas in the north to the pristine beaches in the south, India's geographical expanse is breathtaking. 
 """
 
 async def generate_word(prompt: str):
     global stop
     try:
-        gen_word = ["prash"," prash"," prash"]
 
-        for word in sentence:
+        ''' for word in sentence:
             if s["stop"]:
                 break
             await asyncio.sleep(0.01)
-            yield word
-
-        ''' async with load_model() as model:
+            yield word '''
+        first = True
+        async with load_model() as model:
             loop = asyncio.get_event_loop()
             future = loop.run_in_executor(None, model.infer, prompt)
             gen_word = await asyncio.wait_for(future, 120)
             for word in gen_word:
+                
                 if s["stop"]:
                     break
-                await asyncio.sleep(0.01)
-                yield word '''
+                else:
+                    if first:
+                        first = False
+                        yield prompt + word   
+                    else:
+                        yield word
+            first = True
 
     except asyncio.TimeoutError:
         raise HTTPException(
@@ -78,7 +79,7 @@ async def generate_word(prompt: str):
             detail="Internal Server error"
         ) from e
 
-@router.post("/codegen/api/instruct_resp", tags=["chat"])
+@router.post("/autocomplete/api/instruct_resp", tags=["chat"])
 async def generate(chat_request: ChatRequest):
     try:
         user_prompt = chat_request.prompt
@@ -101,7 +102,7 @@ async def generate(chat_request: ChatRequest):
             content={"error": str(e)}
         )
 
-@router.post("/codegen/api/restart")
+@router.post("/autocomplete/api/restart")
 async def restart_generation(chat_request: ChatRequest):
     try:
         user_prompt = chat_request.prompt
@@ -125,7 +126,7 @@ async def restart_generation(chat_request: ChatRequest):
             content={"error": str(e)}
         )
 
-@router.post("/codegen/api/stop", tags=["chat"])
+@router.post("/autocomplete/api/stop", tags=["chat"])
 async def stop_generation_endpoint():
     try:
         s["stop"] = True

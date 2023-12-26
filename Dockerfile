@@ -52,4 +52,4 @@ ENV CPU_THREADS=$(nproc)
 
 ENV WORKERS=$((CPU_THREADS*2+1))
 
-CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:80", "--worker-connections", "1000","--timeout", "10000", "server:app"]
+CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000", "--worker-connections", "1000","--timeout", "10000", "server:app"]

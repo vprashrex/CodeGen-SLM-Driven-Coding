@@ -32,11 +32,16 @@ def init_app():
     @app.get("/codegen",response_class=HTMLResponse)
     async def index(request:Request):
         return templates.TemplateResponse("index.html",context={"request":request})
+    
+    @app.get("/autocomplete",response_class=HTMLResponse)
+    async def index2(request:Request):
+        return templates.TemplateResponse("index.html",context={"request":request})
 
-    from api.router import chat,conv
+    from api.router import chat,conv,autocomplete
 
     app.include_router(chat.router)
     app.include_router(conv.router)
+    app.include_router(autocomplete.router)
 
     return app
 

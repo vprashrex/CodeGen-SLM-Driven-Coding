@@ -5,6 +5,7 @@ import { HashLink } from 'react-router-hash-link';
 import {
   BrowserRouter as Router
 } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export const NavBar = () => {
 
@@ -51,9 +52,9 @@ export const NavBar = () => {
 
             <span className="navbar-text">
               <HashLink to='#connect'>
-                <button className="vvd sign-in"><span>Sign in</span></button>
                 <button className="vvd"><span>Sign up</span></button>
               </HashLink>
+              <button className="vvd sign-in"><span>Sign in</span></button>
             </span>
           </Navbar.Collapse>
         </Container>
