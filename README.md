@@ -32,6 +32,10 @@
 ## Demo Highlights 🎥
 <video src="./assests/codegen.MP4"></video>
 
+## Two main endpoint that server run
+
+- localhost:8000/autocomplete
+- localhost:8000/codegen
 
 ## Setup
 
@@ -43,9 +47,9 @@ First create a venv.
 python -m venv env && source env/bin/activate
 ```
 
-Next update the ctransformer submodule
+Next step open the environment in powershell of vscode
 ```sh
-git submodule update --init 
+./env/Scripts/Activate.ps1
 ```
 
 Next install the requirements
@@ -56,7 +60,7 @@ pip install -r requirements.txt
 Next download the model weight 
 
 ```sh
-python download_model.py
+python ./api/download_model.py
 ```
 
 Now run the server.py
