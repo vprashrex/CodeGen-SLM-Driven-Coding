@@ -32,18 +32,18 @@ function ForgetPassword({ closePassword }) {
             </Link>
           </div>
           <h2 className='text-3xl text-white ml-10 mr-10'>Forget Password</h2>
-          <form>
+          <form onSubmit={handleSentOTP}>
             <label className='text-2xl text-white'>Enter Your Email</label>
             <br />
             <input
               type='email'
               placeholder='Enter Email Id'
-              required
               className='text-center text-black h-10 w-80 rounded-xl mr-10 ml-10 mt-8'
+              required
             />
             <br/>
             
-            <button onClick={handleSentOTP} type="submit" className='bg-white px-4 py-2 rounded-lg text-black mt-8 mb-10'>Sent OTP</button>
+            <button type="submit" className='bg-white px-4 py-2 rounded-lg text-black mt-8 mb-10'>Sent OTP</button>
   
           </form>
         </>
