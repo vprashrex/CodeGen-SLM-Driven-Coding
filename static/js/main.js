@@ -182,8 +182,8 @@ const getChatResponse = async (incomingChatDiv) => {
             timestamp: formatTimestamp(new Date())
         })
     }
-
-    await (await fetch("/conv",sendmsgoptions)).json();
+    console.log(sessionStorage.getItem("present_session"))
+    //await (await fetch(`${currentPath}/conv`,sendmsgoptions)).json();
     /* --------------------------------------------------------------------- */
     hideStop();
     restartResponse();
@@ -439,8 +439,9 @@ async function localRefresh() {
     };
 
     try {
-        const resp = await fetch("/fetch_session", sendmsgoptions);
+        const resp = await fetch(`${currentPath}/fetch_session`, sendmsgoptions);
         const data = await resp.json(); 
+        console.log(data)
 
         if (data === null){
             loadDataFromLocalstorage();
@@ -525,7 +526,7 @@ function createNewDiv(title,session_id = undefined) {
                 }
             )
         }
-        const API_URL = "/remove_session"
+        const API_URL = `${currentPath}/remove_session`
         fetch(API_URL,requestOptions);
         /* --------------------------------------------------- */
         event.stopPropagation();
@@ -583,7 +584,7 @@ function createNewDiv(title,session_id = undefined) {
                     session_id: history.dataMap.get("session_id"),
                 }),
             };
-            const API_URL = "/session";
+            const API_URL = `${currentPath}/session`;
             fetch(API_URL, requestOptions)
                 .then((response) => response.json())
                 .then((data) => {
