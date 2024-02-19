@@ -27,14 +27,12 @@ class CodeGen:
         self.model = None
 
     def format_prompt(self, user_prompt: str):
-        prompt = "### Instruction:\n"
-        prompt += f"{user_prompt}\n\n"
-        prompt += "### Response:\n"
-        config_attributes = [attr for attr in dir(GenerationConfig) if not attr.startswith("__")]
-        for attr in config_attributes:
-            value = getattr(GenerationConfig, attr)
-            prompt += f"{attr}: {value}\n"
-        return prompt
+        return '''
+            You are a coding bot with a stringent focus on programming-related queries. Your task is to provide detailed and accurate responses to questions related to coding languages, algorithms, data structures, and software development. Exclude non-coding topics entirely, ensuring the model refrains from responding to any queries outside the realm of programming. Emphasize precision and depth in coding-related answers while filtering out unrelated information.
+            ### Instruction:
+            {}
+            ### Response:
+            '''.format(user_prompt.strip()).lstrip()
 
     # GENERATE WORD WITH TIMEOUT_CONDITION
     def generate(self,llm: AutoModelForCausalLM,generation_config: GenerationConfig,user_prompt:str):
@@ -59,11 +57,11 @@ class CodeGen:
             top_k=50,
             top_p=0.9,
             repetition_penalty=1.0,
-            max_new_tokens=512,  # adjust as needed
+            max_new_tokens=512,
             seed=42,
-            reset=False,  # reset history (cache)
-            stream=True,  # streaming per word/token
-            threads=int(os.cpu_count() / 6),  # adjust for your CPU
+            reset=False, 
+            stream=True, 
+            threads=int(os.cpu_count() / 6),
             stop=["<|endoftext|>"],
         )
         gen_word = self.generate(self.model,generation_config,user_prompt.strip())

@@ -26,14 +26,12 @@ class CodeGen:
         self.model = None
 
     def format_prompt(self, user_prompt: str):
-        prompt = "### Instruction:\n"
-        prompt += f"{user_prompt}\n\n"
-        prompt += "### Response:\n"
-        config_attributes = [attr for attr in dir(GenerationConfig) if not attr.startswith("__")]
-        for attr in config_attributes:
-            value = getattr(GenerationConfig, attr)
-            prompt += f"{attr}: {value}\n"
-        return prompt
+        return '''
+            You are an AI programming assistant, utilizing the DeepSeek Coder model, developed by DeepSeek Company, and you only answer questions related to computer science. For politically sensitive questions, security and privacy issues, and other non-computer science questions, you will refuse to answer.
+            ### Instruction:
+            {}
+            ### Response:
+            '''.format(user_prompt.strip()).lstrip()
 
     # GENERATE WORD WITH TIMEOUT_CONDITION
     def generate(self,llm: AutoModelForCausalLM,generation_config: GenerationConfig,user_prompt:str):

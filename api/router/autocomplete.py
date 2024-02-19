@@ -46,11 +46,6 @@ async def generate_word(prompt: str):
     global stop
     try:
 
-        ''' for word in sentence:
-            if s["stop"]:
-                break
-            await asyncio.sleep(0.01)
-            yield word '''
         first = True
         async with load_model() as model:
             loop = asyncio.get_event_loop()
@@ -63,8 +58,10 @@ async def generate_word(prompt: str):
                 else:
                     if first:
                         first = False
+                        await asyncio.sleep(0.01)
                         yield prompt + word   
                     else:
+                        await asyncio.sleep(0.01)
                         yield word
             first = True
 

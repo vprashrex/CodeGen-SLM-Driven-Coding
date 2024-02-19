@@ -34,12 +34,24 @@ const showAnimation = () =>{
 hideAnimation();
 
 const loadDataFromLocalstorage = () => {
+    let heading_name
+    let subtag_name;
+
+    if (currentPath == "/autocomplete"){
+        heading_name = "Code AutoComplete using WizardCode 3B V1.1";
+        subtag_name = "This is a Code AutoComplete Model"
+    }
+    else{
+        heading_name = "Code Instruct Using Magicoder-S-DS-6.7B";
+        subtag_name = "This is a Code Instruct Model"
+    }
 
     const defaultText = `<div class="default-text">
                             <img class="logo-llm" src="./static/images/llm_logo.svg" style="width:120px;margin-top:100px;">
                             <h1>CodeGen: SLMDriven Coding</h1>
                             <h2>SLM (Small Language Model)</h2>
-                            <p>This is a code instruct Model.</p>
+                            <h2>${heading_name }</h2>
+                            <p style="font-weight:bold;">${subtag_name}</p>
                             <p>If you have any query regarding the code,<br>just type the query and you will get the answer</p>
                         </div>`
 
@@ -64,6 +76,8 @@ function formatTimestamp(date) {
     const seconds = String(date.getSeconds()).padStart(2, '0');
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
+
+
 
 const getChatResponse = async (incomingChatDiv) => {
     const API_URL = `${currentPath}/api/instruct_resp`;
@@ -225,8 +239,7 @@ const stopResponse = () => {
         url: `${currentPath}/api/stop`,
         type: requestOptions.method,
         headers: requestOptions.headers,
-        dataType: "json",
-        success: function(response) {
+        success: function() {
             hideStop();
             hideAnimation();
             restartResponse();
