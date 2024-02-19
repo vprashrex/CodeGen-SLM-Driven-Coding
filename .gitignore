@@ -161,7 +161,6 @@ cython_debug/
 
 models/
 alina-code/
-node_modules
 dashboard/node_modules
 test.py
 resume_with_project.docx
