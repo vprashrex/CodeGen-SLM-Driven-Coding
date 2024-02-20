@@ -100,7 +100,7 @@ THIS WILL REMOVE THE SESSION_ID FROM THE REDIS
 JS CODE LINE NO 500 TO 514 (main.js)
 '''
 
-@router.post("codegen/remove_session")
+@router.post("/codegen/remove_session")
 async def remove_session(session:ChatHtml):
     try:
         r.delete(session.session_id)
@@ -128,7 +128,7 @@ JS CODE LINE 532 - 553
 '''
 
 
-@router.post("codegen/session")
+@router.post("/codegen/session")
 async def session(chat_request:ChatHtml):
     try:
         print("current session : {}".format(chat_request.session_id))
@@ -190,7 +190,7 @@ def check_session(session_id: str, title: str):
     
 #
 
-@router.post("codegen/conv")
+@router.post("/codegen/conv")
 async def store_conv(conv: Conv):
     try:
         session_id = conv.session_id
@@ -224,7 +224,7 @@ code line 421 - 459
 main : 437 - 455
 
 '''
-@router.post("codegen/fetch_session")
+@router.post("/codegen/fetch_session")
 async def fetch_session(session_id:ChatHtml):
     try:
         datalist = []

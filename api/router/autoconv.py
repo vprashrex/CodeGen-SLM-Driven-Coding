@@ -248,3 +248,7 @@ async def fetch_session(session_id:ChatHtml):
         )
     except Exception as e:
         print(e)
+
+@router.post("/test/")
+def test_endpoint(data: str):
+    return JSONResponse(content={"received_data": data})

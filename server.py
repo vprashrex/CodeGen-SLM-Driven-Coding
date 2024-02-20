@@ -37,10 +37,11 @@ def init_app():
     async def index2(request:Request):
         return templates.TemplateResponse("index.html",context={"request":request})
 
-    from api.router import chat,conv,autocomplete
+    from api.router import chat,conv,autocomplete, autoconv
 
     app.include_router(chat.router)
     app.include_router(conv.router)
+    app.include_router(autoconv.router)
     app.include_router(autocomplete.router)
 
     return app

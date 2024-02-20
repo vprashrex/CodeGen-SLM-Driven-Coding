@@ -183,7 +183,7 @@ const getChatResponse = async (incomingChatDiv) => {
         })
     }
     console.log(sessionStorage.getItem("present_session"))
-    //await (await fetch(`${currentPath}/conv`,sendmsgoptions)).json();
+    await (await fetch(`${currentPath}/conv`,sendmsgoptions)).json();
     /* --------------------------------------------------------------------- */
     hideStop();
     restartResponse();
