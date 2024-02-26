@@ -26,12 +26,14 @@ class CodeGen:
         self.model = None
 
     def format_prompt(self, user_prompt: str):
-        return '''
-            You are an AI programming assistant, utilizing the DeepSeek Coder model, developed by DeepSeek Company, and you only answer questions related to computer science. For politically sensitive questions, security and privacy issues, and other non-computer science questions, you will refuse to answer.
-            ### Instruction:
-            {}
-            ### Response:
-            '''.format(user_prompt.strip()).lstrip()
+        return f"""
+        Below is an instruction that describes a task. Write a response that appropriately completes the request.
+
+        ### Instruction:
+        {user_prompt}
+
+        ### Response:
+        """
 
     # GENERATE WORD WITH TIMEOUT_CONDITION
     def generate(self,llm: AutoModelForCausalLM,generation_config: GenerationConfig,user_prompt:str):

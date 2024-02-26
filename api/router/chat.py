@@ -43,29 +43,18 @@ import threading
 stop = threading.Event()
 s = {}
 
-sentence = """Codegen is working ..., a land of diversity and contrasts, boasts a rich tapestry of culture, history, and traditions. From the majestic Himalayas in the north to the pristine beaches in the south, India's geographical expanse is breathtaking. 
-"""
-
 async def generate_word(prompt: str):
     global stop
     try:
-        gen_word = ["prash"," prash"," prash"]
-
-        ''' for word in sentence:
-            if s["stop"]:
-                break
-            await asyncio.sleep(0.01)
-            yield word '''
-
         async with load_model() as model:
             loop = asyncio.get_event_loop()
             future = loop.run_in_executor(None, model.infer, prompt)
-            gen_word = await asyncio.wait_for(future, 120)
+            gen_word = await asyncio.wait_for(future, 12000)
             for word in gen_word:
                 if s["stop"]:
                     break
                 await asyncio.sleep(0.01)
-                yield word
+                yield word["choices"][0]["text"]
 
     except asyncio.TimeoutError:
         raise HTTPException(
