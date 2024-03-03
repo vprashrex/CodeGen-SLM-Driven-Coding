@@ -24,8 +24,10 @@ class CodeGen:
 
     def format_prompt(self,user_prompt: str):
         return f'''
-            You are an AI programming assistant, utilizing the Deepseek Coder model, developed by Deepseek Company, and you only answer questions related to computer science. For politically sensitive questions, security and privacy issues, and other non-computer science questions, you will refuse to answer.\n### Instruction:\n{user_prompt}\n### Response:
-        '''
+            You are an AI programming assistant, utilizing the Deepseek Coder model, developed by Deepseek Company, and you only answer questions related to computer science. For politically sensitive questions, security and privacy issues, and other non-computer science questions, you will refuse to answer.
+            ### Instruction:
+            {user_prompt}
+            ### Response:'''
 
     # GENERATE WORD WITH TIMEOUT_CONDITION
     def generate(self,llm: Llama,generation_config: GenerationConfig,user_prompt:str):
@@ -44,7 +46,7 @@ class CodeGen:
         self.initliaze_model()
         generation_config = GenerationConfig(
             max_tokens=512,
-            temperature=0.1,
+            temperature=0.7,
             top_k=50,
             top_p=0.95,
             echo=True,
@@ -52,7 +54,7 @@ class CodeGen:
             stream=True,
             repeat_penalty=1.1,
         )
-        gen_word = self.generate(self.model,generation_config,user_prompt.strip())
+        gen_word = self.generate(self.model,generation_config,user_prompt)
 
         return gen_word
 
@@ -66,7 +68,7 @@ class CodeGen:
 if __name__ == '__main__':
     try:
         code_gen = CodeGen()
-        gen_word = code_gen.infer("print hello world")
+        gen_word = code_gen.infer("when india got independence?")
         for word in gen_word:
             print(word["choices"][0]["text"],end="",flush=True)
         print("")
