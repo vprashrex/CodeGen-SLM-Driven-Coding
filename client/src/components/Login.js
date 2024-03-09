@@ -1,6 +1,7 @@
 import React, { useState, useEffect} from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {jwtDecode} from 'jwt-decode';
+import env from "react-dotenv";
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -64,7 +65,7 @@ const Login = () => {
   useEffect(() => {
     /* global google */
     google.accounts.id.initialize({
-      client_id: "104138030032-q5h5koc91og2qm4i7eqr68a4p69rfvem.apps.googleusercontent.com",
+      client_id: env.client_id,
       callback: handleCallbackResponse
     })
 

@@ -1,10 +1,13 @@
 const jwt = require('jsonwebtoken');
 const User = require('../schema');
+require("dotenv").config()
+
+const jwt_token = process.env.jwt_token;
 
 const Authenticate = async (req, res, next) =>{
     try{
         const token = req.cookies.jwtoken;
-        const verifyToken = jwt.verify(token, "MySECRETKeyfordatabasejwt123");
+        const verifyToken = jwt.verify(token, jwt_token);
         if(verifyToken){
             const decoded = jwt.decode(token);
             console.log(decoded)
