@@ -1,33 +1,38 @@
 from llama_cpp import Llama
 from dataclasses import dataclass,asdict
+from transformers import AutoTokenizer
+import os
 
 @dataclass
 class GenerationConfig:
     temperature: float
+    seed: int
     top_k: int
     top_p: float
     stream: bool
     max_tokens:int
-    echo:bool
-    stop: list
     repeat_penalty:float
+    stop:list
 
 class ModelsPath:
-    CODE_GEN_MODEL = "./models/instruct/instruct.Q4_K.gguf"
+    CODE_GEN_MODEL = os.path.abspath("./models/instruct/deepseek-coder-1.3b-instruct.Q4_K_M.gguf")
 
 
 class CodeGen:
     MAX_LENGTH = 2048
 
     def __init__(self):
+        self.tokenizer = AutoTokenizer.from_pretrained("deepseek-ai/deepseek-coder-6.7b-instruct", trust_remote_code=True)
         self.model = None
 
     def format_prompt(self,user_prompt: str):
-        return f'''
-            You are an AI programming assistant, utilizing the Deepseek Coder model, developed by Deepseek Company, and you only answer questions related to computer science. For politically sensitive questions, security and privacy issues, and other non-computer science questions, you will refuse to answer.
-            ### Instruction:
-            {user_prompt}
-            ### Response:'''
+        messages=[
+            { 'role': 'user', 'content': user_prompt}
+            ]
+        
+        inputs = self.tokenizer.apply_chat_template(messages, add_generation_prompt=True)
+
+        return inputs
 
     # GENERATE WORD WITH TIMEOUT_CONDITION
     def generate(self,llm: Llama,generation_config: GenerationConfig,user_prompt:str):
@@ -39,7 +44,9 @@ class CodeGen:
     def initliaze_model(self):
         if self.model is None:
             self.model = Llama(
-                ModelsPath.CODE_GEN_MODEL
+                model_path=ModelsPath.CODE_GEN_MODEL,
+                n_ctx=2048,
+                verbose=False
             )
 
     def infer(self,user_prompt:str):
@@ -48,11 +55,11 @@ class CodeGen:
             max_tokens=512,
             temperature=0.7,
             top_k=50,
-            top_p=0.95,
-            echo=True,
-            stop=["<|EOT|>"],
+            top_p=0.9,
             stream=True,
-            repeat_penalty=1.1,
+            repeat_penalty=1.0,
+            seed=42,
+            stop=["<|EOT|>"]
         )
         gen_word = self.generate(self.model,generation_config,user_prompt)
 
@@ -67,10 +74,16 @@ class CodeGen:
 
 if __name__ == '__main__':
     try:
-        code_gen = CodeGen()
-        gen_word = code_gen.infer("when india got independence?")
-        for word in gen_word:
-            print(word["choices"][0]["text"],end="",flush=True)
-        print("")
+
+        code_gen = CodeGen()        
+        user_prefix = "[user]: "
+        assistant_prefix = "[assistant]: "
+        while True:
+            user_prompt = input(user_prefix)
+            gen_word = code_gen.infer(user_prompt)
+            print(assistant_prefix, end="", flush=True)
+            for word in gen_word:
+                print(word["choices"][0]["text"],end="",flush=True)
+            print("")
     except Exception as e:
         print(e)
