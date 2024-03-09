@@ -15,7 +15,7 @@ class GenerationConfig:
     stop:list
 
 class ModelsPath:
-    CODE_GEN_MODEL = os.path.abspath("./models/instruct/deepseek-coder-1.3b-instruct.Q4_K_M.gguf")
+    CODE_GEN_MODEL = os.path.abspath("./models/instruct/instruct-chat.Q4_K_M.gguf")
 
 
 class CodeGen:

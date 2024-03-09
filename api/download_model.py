@@ -18,12 +18,12 @@ if __name__ == "__main__":
     print("downloading instruct model ......")
 
     destination_folder = "models/instruct"
-    repo_id = "prashrex/CodeGen-Instruct"
-    model_filename = "instruct.Q4_K.gguf"
+    repo_id = "prashrex/codegen2"
+    model_filename = "instruct-chat.Q4_K_M.gguf"
     config_filename = "config.json"
 
     download_file(destination_folder, repo_id, model_filename)
-    download_file(destination_folder, repo_id, config_filename)
+    #download_file(destination_folder, repo_id, config_filename)
 
     print("downloaded instruct model .......")
 
