@@ -2,9 +2,47 @@ import React, { useState, useRef } from "react";
 import { XCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-function ConfirmPassword({ closeConfirmPassword }) {
+function ConfirmPassword({ closeConfirmPassword, email}) {
   const [otp, setOtp] = useState(['', '', '', '']);
   const inputs = useRef([]);
+  const [password, setPswd] = useState('');
+
+  const handlePswdChange = (e) => {
+    setPswd(e.target.value);
+  };
+
+  const handleSubmitOtp = async (e) => {
+    e.preventDefault();
+    const myotp = otp.join('');
+    const data = {
+      otpCode: myotp,
+      newpswd: password,
+      email: email
+    };
+    console.log(data);
+    //Object.assign(data, email);
+    //console.log(data)
+    try {
+      const response = await fetch('http://localhost:5000/changepwd', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+      if (response.ok) {
+        window.alert('Password Changed Successfully');
+        console.log('Success');
+        //navigate('/login');
+      } 
+      else {
+        window.alert('Could not change password');
+        console.error(response.message);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
 
   // Function to handle input change
   const handleChange = (index, e) => {
@@ -23,6 +61,8 @@ function ConfirmPassword({ closeConfirmPassword }) {
     }
   };
 
+
+
   return (
     
       <div className='bg-purple-700 bg-opacity-40 rounded-xl flex flex-col justify-center align-center gap-2 text-center' style={{ height: '430px', width: '350px' }}>
@@ -35,7 +75,7 @@ function ConfirmPassword({ closeConfirmPassword }) {
             </Link>
           </div>
 
-        <form className="flex flex-col items-center">
+        <form onSubmit={handleSubmitOtp} className="flex flex-col items-center">
           <div className="flex flex-row justify-center align-center gap-4">
             {otp.map((value, index) => (
               <input
@@ -58,15 +98,7 @@ function ConfirmPassword({ closeConfirmPassword }) {
               type="password"
               placeholder="Enter new password"
               required
-              className="text-center text-black h-10 w-80 rounded-xl mr-5 ml-5"
-            />
-
-            <label className='text-2xl text-white'>Confirm Password</label>
-            <input
-              id="confirm-password"
-              type="password"
-              placeholder="Enter password again"
-              required
+              onChange = {handlePswdChange}
               className="text-center text-black h-10 w-80 rounded-xl mr-5 ml-5"
             />
 

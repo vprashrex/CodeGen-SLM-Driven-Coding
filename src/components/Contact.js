@@ -6,11 +6,9 @@ import TrackVisibility from 'react-on-screen';
 
 export const Contact = () => {
   const formInitialDetails = {
-    firstName: '',
-    lastName: '',
+    username: '',
+    password: '',
     email: '',
-    phone: '',
-    message: ''
   }
   const [formDetails, setFormDetails] = useState(formInitialDetails);
   const [buttonText, setButtonText] = useState('Sign Up');
@@ -26,7 +24,7 @@ export const Contact = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setButtonText("Sending...");
-    let response = await fetch("http://localhost:5000/contact", {
+    let response = await fetch("http://localhost:5000/signup", {
       method: "POST",
       headers: {
         "Content-Type": "application/json;charset=utf-8",
@@ -62,16 +60,13 @@ export const Contact = () => {
                 <form onSubmit={handleSubmit}>
                   <Row>
                     <Col size={12} sm={8} className="px-1">
-                      <input type="text" value={formDetails.firstName} placeholder="Full Name" onChange={(e) => onFormUpdate('firstName', e.target.value)} />
+                      <input type="text" value={formDetails.username} placeholder="Username" onChange={(e) => onFormUpdate('username', e.target.value)} />
                     </Col>
                     <Col size={12} sm={8} className="px-1">
-                      <input type="text" value={formDetails.lasttName} placeholder="UserName" onChange={(e) => onFormUpdate('lastName', e.target.value)}/>
+                      <input type="password" value={formDetails.password} placeholder="Password" onChange={(e) => onFormUpdate('password', e.target.value)}/>
                     </Col>
                     <Col size={12} sm={8} className="px-1">
                       <input type="email" value={formDetails.email} placeholder="Email Address" onChange={(e) => onFormUpdate('email', e.target.value)} />
-                    </Col>
-                    <Col size={12} sm={8} className="px-1">
-                      <input type="password" value={formDetails.phone} placeholder="Password" onChange={(e) => onFormUpdate('phone', e.target.value)}/>
                     </Col>
                     <Col size={12} sm={8} className="px-1" >
                       <button type="submit"><span>{buttonText}</span></button>
